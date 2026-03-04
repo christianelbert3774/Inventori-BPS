@@ -1,59 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIBAS — Sistem Inventori Barang BPS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Struktur File yang Disertakan
 
-## About Laravel
+```
+sibas/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.php
+│   │   │   └── Karyawan/
+│   │   │       ├── DashboardController.php
+│   │   │       ├── PemakaianController.php
+│   │   │       └── PengadaanController.php
+│   │   └── Middleware/
+│   │       └── CheckRole.php
+│   └── Models/
+│       ├── User.php
+│       ├── Role.php
+│       ├── Barang.php
+│       ├── Pemakaian.php
+│       ├── PemakaianDetail.php
+│       ├── Pengadaan.php
+│       └── PengadaanDetail.php
+├── resources/views/
+│   ├── layouts/
+│   │   └── app.blade.php          ← Layout utama (sidebar + topbar)
+│   ├── auth/
+│   │   └── login.blade.php        ← Halaman login
+│   └── karyawan/
+│       ├── dashboard.blade.php        ← Dashboard stok barang
+│       ├── form-pemakaian.blade.php   ← Form permintaan pemakaian
+│       ├── form-pengadaan.blade.php   ← Form permintaan pengadaan
+│       ├── riwayat-pemakaian.blade.php
+│       └── riwayat-pengadaan.blade.php
+├── public/
+│   ├── css/app.css
+│   ├── js/app.js
+│   └── images/                    ← Letakkan logo-bps.png di sini
+├── routes/web.php
+├── database/seeders/DatabaseSeeder.php
+└── bootstrap/app.php              ← Registrasi middleware 'role'
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Cara Setup di Project Laravel yang Ada
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Salin File
 
-## Learning Laravel
+Salin semua file ke project Laravel Anda sesuai path-nya masing-masing.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 2. Konfigurasi .env
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=inventori-bps
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Laravel Sponsors
+### 3. Import Database
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+mysql -u root inventori-bps < inventori-bps.sql
+```
 
-### Premium Partners
+### 4. Jalankan Seeder (data dummy)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+php artisan db:seed
+```
 
-## Contributing
+### 5. Pasang Logo BPS
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Salin file logo BPS ke:
+```
+public/images/logo-bps.png
+```
 
-## Code of Conduct
+### 6. Daftarkan Middleware (Laravel 11)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+File `bootstrap/app.php` sudah disertakan dengan registrasi middleware `role`.
+Jika project Anda masih Laravel 10, tambahkan di `app/Http/Kernel.php`:
 
-## Security Vulnerabilities
+```php
+protected $middlewareAliases = [
+    // ... existing
+    'role' => \App\Http\Middleware\CheckRole::class,
+];
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 7. Pastikan Auth Config
 
-## License
+Di `config/auth.php`, pastikan model User mengarah ke:
+```php
+'model' => App\Models\User::class,
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 8. Jalankan Aplikasi
+
+```bash
+php artisan serve
+```
+
+---
+
+## Akun Login (Setelah Seeder)
+
+| Email                  | Password | Role         |
+|------------------------|----------|--------------|
+| karyawan@bps.go.id     | password | Karyawan     |
+| admin@bps.go.id        | password | Divisi Umum  |
+| pbj@bps.go.id          | password | PBJ          |
+
+---
+
+## Fitur yang Sudah Ada
+
+- ✅ Login dengan email + password (redirect by role)
+- ✅ Dashboard karyawan: statistik stok, tabel barang dengan filter
+- ✅ Form permintaan pemakaian (multi-barang, tambah/hapus baris dinamis)
+- ✅ Form permintaan pengadaan:
+  - **Restock**: pilih barang yang ada + jumlah
+  - **Barang Baru**: nama, satuan, kategori, alasan
+- ✅ Riwayat pemakaian & pengadaan
+- ✅ Middleware `CheckRole` untuk proteksi halaman
+- ✅ Validasi server-side di semua form
+- ✅ Desain responsif, full-screen, nuansa BPS
+
+---
+
+## Catatan Developer
+
+- Kolom `keterangan` tidak ada di tabel `pemakaian` dan `pengadaan_detail` (sesuai SQL).
+  Jika dibutuhkan, tambahkan migrasi: `php artisan make:migration add_keterangan_to_pemakaian`
+- Stok "hampir habis" didefinisikan: stok ≤ 10 (bisa diubah di `Barang::getStatusAttribute`)
+- Pengadaan barang baru otomatis membuat record di tabel `barang` dengan stok 0

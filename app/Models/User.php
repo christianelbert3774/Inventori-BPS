@@ -2,53 +2,62 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'users';
+
     protected $fillable = [
+        'role',
         'name',
         'email',
         'password',
-        'role_id',
+        'nip',
+        'bagian',
+        'jabatan',
+        'no_telp',
+        'is_active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    // ── RELATIONSHIPS ──
+
+    public function pemakaians()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Pemakaian::class);
     }
 
-    public function role()
+    public function pengadaans()
     {
-        return $this->belongsTo(Role::class);
+        return $this->hasMany(Pengadaan::class);
+    }
+
+    // ── HELPERS ──
+
+    public function isKaryawan(): bool
+    {
+        return $this->role === 'karyawan';
+    }
+
+    public function isDivisiUmum(): bool
+    {
+        return $this->role === 'admin_gudang';
+    }
+
+    public function isPbj(): bool
+    {
+        return $this->role === 'pejabat_pengadaan';
     }
 }
