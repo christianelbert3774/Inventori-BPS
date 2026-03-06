@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <h1>Sistem Inventori Barang<br/>BPS Republik Indonesia</h1>
+    <h1>Sistem Inventori Barang<br/>BPS Kota Pekanbaru</h1>
     <p>Platform pengelolaan inventori terpadu untuk<br/>mendukung operasional BPS secara efisien.</p>
 
     <div class="login-stats">

@@ -2,20 +2,22 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Karyawan\DashboardController;
+use App\Http\Controllers\Karyawan\NotifikasiController;
 use App\Http\Controllers\Karyawan\PemakaianController;
 use App\Http\Controllers\Karyawan\PengadaanController;
+use App\Http\Controllers\Karyawan\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 // ── REDIRECT ROOT ──
 Route::get('/', function () {
     if (auth()->check()) {
-        return redirect()->route('login');
+        return redirect()->route('karyawan.dashboard');
     }
     return redirect()->route('login');
 });
 
-// ── AUTH: Login (tanpa middleware guest agar tidak loop) ──
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+// ── AUTH ──
+Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 Route::post('/logout', [AuthController::class, 'logout'])
@@ -40,4 +42,13 @@ Route::middleware(['auth'])
         Route::get('/pengadaan',        [PengadaanController::class, 'index'])->name('pengadaan.index');
         Route::get('/pengadaan/create', [PengadaanController::class, 'create'])->name('pengadaan.create');
         Route::post('/pengadaan',       [PengadaanController::class, 'store'])->name('pengadaan.store');
+
+        // Profil
+        Route::get('/profil',              [ProfilController::class, 'index'])->name('profil');
+        Route::patch('/profil',            [ProfilController::class, 'updateProfil'])->name('profil.update');
+        Route::patch('/profil/password',   [ProfilController::class, 'updatePassword'])->name('profil.password');
+        Route::get('/profil/print',        [ProfilController::class, 'printAktivitas'])->name('profil.print');
+
+        // Notifikasi
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
     });

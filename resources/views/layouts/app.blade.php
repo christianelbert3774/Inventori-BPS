@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="{{ asset('css/app.css') }}" rel="stylesheet"/>
+  <link href="{{ asset('css/tambahan.css') }}" rel="stylesheet"/>
   @stack('styles')
 </head>
 <body>
@@ -64,7 +65,19 @@
       </a>
 
       <div class="menu-section">Akun</div>
-      <a href="#" class="menu-item">
+
+      <a href="{{ route('karyawan.notifikasi') }}"
+         class="menu-item {{ request()->routeIs('karyawan.notifikasi') ? 'active' : '' }}">
+        <i class="bi bi-bell"></i> Notifikasi
+        @php $badge = \App\Http\Controllers\Karyawan\NotifikasiController::getBadgeCount(); @endphp
+        @if($badge > 0)
+          <span style="margin-left:auto;background:rgba(220,38,38,.85);color:#fff;font-size:10px;
+                       font-weight:700;padding:2px 7px;border-radius:20px">{{ $badge }}</span>
+        @endif
+      </a>
+
+      <a href="{{ route('karyawan.profil') }}"
+         class="menu-item {{ request()->routeIs('karyawan.profil') ? 'active' : '' }}">
         <i class="bi bi-person-circle"></i> Profil Saya
       </a>
     </nav>
@@ -90,9 +103,22 @@
         <input type="text" placeholder="Cari barang..."/>
       </div>
       <div class="topbar-actions">
-        <div class="topbar-icon-btn">
+
+        {{-- Bell icon dengan badge --}}
+        <a href="{{ route('karyawan.notifikasi') }}" class="topbar-icon-btn" title="Notifikasi">
           <i class="bi bi-bell"></i>
-        </div>
+          @php $badge = \App\Http\Controllers\Karyawan\NotifikasiController::getBadgeCount(); @endphp
+          @if($badge > 0)
+            <span class="notif-badge">{{ $badge > 9 ? '9+' : $badge }}</span>
+          @endif
+        </a>
+
+        {{-- Profil icon --}}
+        <a href="{{ route('karyawan.profil') }}" class="topbar-icon-btn" title="Profil Saya">
+          <i class="bi bi-person-circle"></i>
+        </a>
+
+        {{-- Logout --}}
         <form method="POST" action="{{ route('logout') }}" style="display:inline">
           @csrf
           <button type="submit" class="topbar-icon-btn" title="Keluar">
@@ -104,7 +130,6 @@
 
     {{-- CONTENT --}}
     <div class="content">
-
       @if(session('success'))
         <div class="alert alert-success">
           <i class="bi bi-check-circle-fill"></i>
