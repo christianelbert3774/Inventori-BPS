@@ -141,6 +141,14 @@ html, body {
 }
 .topbar-search input { border: none; background: none; font-family: inherit; font-size: 13px; color: var(--text-primary); outline: none; width: 100%; }
 .topbar-search i { color: var(--text-secondary); font-size: 14px; }
+.search-clear-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--border); color: var(--text-secondary);
+  font-size: 9px; flex-shrink: 0; text-decoration: none;
+  transition: var(--transition);
+}
+.search-clear-btn:hover { background: #DC2626; color: #fff; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .topbar-icon-btn {
   width: 36px; height: 36px; border-radius: 9px;

@@ -21,10 +21,13 @@ class DashboardController extends Controller
             $query->where('stok', 0);
         }
 
-        // Search
+        // Search (terisolasi dalam group agar tidak merusak kondisi filter)
         if ($request->filled('q')) {
-            $query->where('nama_barang', 'like', '%' . $request->q . '%')
-                  ->orWhere('kode_barang', 'like', '%' . $request->q . '%');
+            $q = $request->q;
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nama_barang', 'like', '%' . $q . '%')
+                    ->orWhere('kode_barang', 'like', '%' . $q . '%');
+            });
         }
 
         $barangs = $query->paginate(10)->withQueryString();
