@@ -98,10 +98,19 @@
     {{-- TOPBAR --}}
     <div class="topbar">
       <div class="topbar-title">@yield('topbar-title')</div>
-      <div class="topbar-search">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Cari barang..."/>
-      </div>
+      <form action="{{ route('karyawan.dashboard') }}" method="GET" class="topbar-search" role="search" id="topbar-search-form">
+        @if(request('filter'))
+          <input type="hidden" name="filter" value="{{ request('filter') }}"/>
+        @endif
+        <i class="bi bi-search" style="cursor:pointer" onclick="document.getElementById('topbar-search-form').submit()"></i>
+        <input type="text" name="q" placeholder="Cari barang..." value="{{ request('q') }}" autocomplete="off" id="topbar-search-input"/>
+        @if(request('q'))
+          <a href="{{ route('karyawan.dashboard', request('filter') ? ['filter' => request('filter')] : []) }}"
+             class="search-clear-btn" title="Hapus pencarian">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        @endif
+      </form>
       <div class="topbar-actions">
 
         {{-- Bell icon dengan badge --}}

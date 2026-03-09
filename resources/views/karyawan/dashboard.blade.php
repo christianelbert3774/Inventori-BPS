@@ -83,13 +83,14 @@
       </div>
       <div class="card-actions">
         <div class="filter-tabs">
-          <a href="{{ route('karyawan.dashboard') }}"
+          @php $searchQ = request('q') ? ['q' => request('q')] : []; @endphp
+          <a href="{{ route('karyawan.dashboard', $searchQ) }}"
              class="filter-tab {{ !request('filter') ? 'active' : '' }}">Semua</a>
-          <a href="{{ route('karyawan.dashboard', ['filter' => 'tersedia']) }}"
+          <a href="{{ route('karyawan.dashboard', array_merge($searchQ, ['filter' => 'tersedia'])) }}"
              class="filter-tab {{ request('filter') === 'tersedia' ? 'active' : '' }}">Tersedia</a>
-          <a href="{{ route('karyawan.dashboard', ['filter' => 'hampir_habis']) }}"
+          <a href="{{ route('karyawan.dashboard', array_merge($searchQ, ['filter' => 'hampir_habis'])) }}"
              class="filter-tab {{ request('filter') === 'hampir_habis' ? 'active' : '' }}">Hampir Habis</a>
-          <a href="{{ route('karyawan.dashboard', ['filter' => 'habis']) }}"
+          <a href="{{ route('karyawan.dashboard', array_merge($searchQ, ['filter' => 'habis'])) }}"
              class="filter-tab {{ request('filter') === 'habis' ? 'active' : '' }}">Habis</a>
         </div>
       </div>
