@@ -32,7 +32,7 @@
     @endforeach
   </template>
 
-  <form method="POST" action="{{ route('karyawan.pemakaian.store') }}">
+  <form method="POST" action="{{ route('karyawan.pemakaian.store') }}" id="form-pemakaian">
     @csrf
 
     {{-- INFO PEMOHON --}}
@@ -114,7 +114,17 @@
         <a href="{{ route('karyawan.dashboard') }}" class="btn-action btn-outline">
           <i class="bi bi-x"></i> Batal
         </a>
-        <button type="submit" class="btn-action btn-primary btn-lg">
+        <button type="button" class="btn-action btn-primary btn-lg"
+          onclick="showConfirm({
+            title: 'Konfirmasi Kirim Permintaan',
+            message: 'Pastikan barang dan jumlah yang diminta sudah benar. Permintaan akan dikirim ke Admin Gudang untuk diproses.',
+            icon: 'bi-send-fill',
+            iconColor: '#0055A5',
+            confirmText: 'Ya, Kirim',
+            confirmClass: 'confirm-btn-primary',
+            confirmIcon: 'bi-send-fill',
+            onConfirm: function() { document.getElementById('form-pemakaian').submit(); }
+          })">
           <i class="bi bi-send"></i> Kirim Permintaan
         </button>
       </div>
