@@ -83,9 +83,9 @@
     </nav>
 
     <div class="sidebar-footer">
-      <form method="POST" action="{{ route('logout') }}">
+      <form method="POST" action="{{ route('logout') }}" id="form-logout-sidebar">
         @csrf
-        <button type="submit" class="btn-logout">
+        <button type="button" class="btn-logout" onclick="doLogout('form-logout-sidebar')">
           <i class="bi bi-box-arrow-left"></i> Keluar
         </button>
       </form>
@@ -128,9 +128,9 @@
         </a>
 
         {{-- Logout --}}
-        <form method="POST" action="{{ route('logout') }}" style="display:inline">
+        <form method="POST" action="{{ route('logout') }}" id="form-logout-topbar" style="display:inline">
           @csrf
-          <button type="submit" class="topbar-icon-btn" title="Keluar">
+          <button type="button" class="topbar-icon-btn" title="Keluar" onclick="doLogout('form-logout-topbar')">
             <i class="bi bi-box-arrow-right"></i>
           </button>
         </form>
@@ -162,5 +162,152 @@
 
 <script src="{{ asset('js/app.js') }}"></script>
 @stack('scripts')
+
+{{-- ── GLOBAL CONFIRMATION MODAL ── --}}
+<div id="confirm-modal-overlay" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(15,23,42,.45);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+" onclick="_confirmHandleOverlayClick(event)">
+  <div id="confirm-modal-box" style="
+    background:#fff;border-radius:20px;padding:36px 32px 28px;
+    max-width:420px;width:90%;box-shadow:0 24px 60px rgba(15,23,42,.18);
+    transform:scale(.92);opacity:0;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .18s ease;
+    position:relative;
+  ">
+    {{-- Icon --}}
+    <div id="confirm-modal-icon-wrap" style="
+      width:64px;height:64px;border-radius:50%;display:flex;
+      align-items:center;justify-content:center;margin:0 auto 18px;
+      background:#FEF2F2;
+    ">
+      <i id="confirm-modal-icon" class="bi bi-question-circle-fill" style="font-size:28px;color:#DC2626"></i>
+    </div>
+    {{-- Title --}}
+    <h3 id="confirm-modal-title" style="
+      text-align:center;font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:1.1rem;font-weight:700;color:#1e293b;margin:0 0 8px;
+    ">Konfirmasi</h3>
+    {{-- Message --}}
+    <p id="confirm-modal-message" style="
+      text-align:center;font-size:.875rem;color:#64748b;
+      line-height:1.6;margin:0 0 28px;
+    ">Apakah Anda yakin?</p>
+    {{-- Buttons --}}
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="hideConfirm()" style="
+        flex:1;padding:11px 20px;border-radius:12px;
+        border:1.5px solid #e2e8f0;background:#f8fafc;
+        font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;
+        font-weight:600;color:#64748b;cursor:pointer;
+        transition:all .15s ease;
+      " onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+        <i class="bi bi-x-lg" style="margin-right:6px"></i>Batal
+      </button>
+      <button id="confirm-modal-confirm-btn" style="
+        flex:1;padding:11px 20px;border-radius:12px;border:none;
+        background:#DC2626;color:#fff;
+        font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;
+        font-weight:600;cursor:pointer;transition:all .15s ease;
+      ">
+        <i id="confirm-modal-confirm-icon" class="bi bi-check-lg" style="margin-right:6px"></i>
+        <span id="confirm-modal-confirm-text">Ya, Lanjutkan</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Global Confirm Modal ──────────────────────────────────────
+var _confirmCallback = null;
+
+function doLogout(formId) {
+  showConfirm({
+    title: 'Konfirmasi Keluar',
+    message: 'Apakah Anda yakin ingin keluar dari sistem SIBAS?',
+    icon: 'bi-box-arrow-right',
+    iconColor: '#DC2626',
+    confirmText: 'Ya, Keluar',
+    confirmClass: 'confirm-btn-danger',
+    onConfirm: function() { document.getElementById(formId).submit(); }
+  });
+}
+
+function showConfirm(opts) {
+  opts = opts || {};
+  var overlay = document.getElementById('confirm-modal-overlay');
+  var box     = document.getElementById('confirm-modal-box');
+  var iconWrap= document.getElementById('confirm-modal-icon-wrap');
+  var icon    = document.getElementById('confirm-modal-icon');
+  var title   = document.getElementById('confirm-modal-title');
+  var msg     = document.getElementById('confirm-modal-message');
+  var btn     = document.getElementById('confirm-modal-confirm-btn');
+  var btnIcon = document.getElementById('confirm-modal-confirm-icon');
+  var btnText = document.getElementById('confirm-modal-confirm-text');
+
+  // Apply options
+  title.textContent   = opts.title   || 'Konfirmasi';
+  msg.textContent     = opts.message || 'Apakah Anda yakin ingin melanjutkan aksi ini?';
+  btnText.textContent = opts.confirmText || 'Ya, Lanjutkan';
+
+  // Icon
+  var iconClass = opts.icon || 'bi-question-circle-fill';
+  icon.className = 'bi ' + iconClass;
+  var iconColor = opts.iconColor || '#2563EB';
+  icon.style.color   = iconColor;
+  // icon bg = iconColor with low opacity
+  var hex = iconColor;
+  iconWrap.style.background = hex + '1a';
+
+  // Confirm button style
+  var confirmClass = opts.confirmClass || 'confirm-btn-primary';
+  if (confirmClass === 'confirm-btn-danger') {
+    btn.style.background = '#DC2626';
+    btnIcon.className = 'bi bi-box-arrow-right';
+  } else if (confirmClass === 'confirm-btn-warning') {
+    btn.style.background = '#D97706';
+    btnIcon.className = 'bi bi-check-lg';
+  } else {
+    btn.style.background = '#0055A5';
+    btnIcon.className = 'bi bi-check-lg';
+  }
+  if (opts.confirmIcon) btnIcon.className = 'bi ' + opts.confirmIcon;
+
+  _confirmCallback = opts.onConfirm || null;
+  btn.onclick = function() {
+    hideConfirm();
+    if (_confirmCallback) setTimeout(_confirmCallback, 120);
+  };
+
+  overlay.style.display = 'flex';
+  // Animate in
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      box.style.transform = 'scale(1)';
+      box.style.opacity   = '1';
+    });
+  });
+
+  document.addEventListener('keydown', _confirmKeyHandler);
+}
+
+function hideConfirm() {
+  var overlay = document.getElementById('confirm-modal-overlay');
+  var box     = document.getElementById('confirm-modal-box');
+  box.style.transform = 'scale(.92)';
+  box.style.opacity   = '0';
+  setTimeout(function() { overlay.style.display = 'none'; }, 200);
+  document.removeEventListener('keydown', _confirmKeyHandler);
+}
+
+function _confirmKeyHandler(e) {
+  if (e.key === 'Escape') hideConfirm();
+}
+
+function _confirmHandleOverlayClick(e) {
+  if (e.target === document.getElementById('confirm-modal-overlay')) hideConfirm();
+}
+</script>
+
 </body>
 </html>

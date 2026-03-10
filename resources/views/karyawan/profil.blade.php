@@ -90,7 +90,7 @@
       <h3><i class="bi bi-person-lines-fill"></i> Data Diri</h3>
       <p>Perbarui informasi profil Anda. Email digunakan untuk login.</p>
     </div>
-    <form method="POST" action="{{ route('karyawan.profil.update') }}">
+    <form method="POST" action="{{ route('karyawan.profil.update') }}" id="form-profil-info">
       @csrf
       @method('PATCH')
       <div class="form-card-body">
@@ -145,7 +145,17 @@
         </div>
       </div>
       <div class="form-actions">
-        <button type="submit" class="btn-action btn-primary btn-lg">
+        <button type="button" class="btn-action btn-primary btn-lg"
+          onclick="showConfirm({
+            title: 'Simpan Perubahan Profil',
+            message: 'Apakah Anda yakin ingin menyimpan perubahan informasi profil Anda?',
+            icon: 'bi-person-check-fill',
+            iconColor: '#0055A5',
+            confirmText: 'Ya, Simpan',
+            confirmClass: 'confirm-btn-primary',
+            confirmIcon: 'bi-check-lg',
+            onConfirm: function() { document.getElementById('form-profil-info').submit(); }
+          })">
           <i class="bi bi-check-lg"></i> Simpan Perubahan
         </button>
       </div>
@@ -160,7 +170,7 @@
       <h3><i class="bi bi-shield-lock"></i> Ubah Password</h3>
       <p>Pastikan password baru Anda kuat dan mudah diingat. Minimal 8 karakter.</p>
     </div>
-    <form method="POST" action="{{ route('karyawan.profil.password') }}">
+    <form method="POST" action="{{ route('karyawan.profil.password') }}" id="form-profil-password">
       @csrf
       @method('PATCH')
       <div class="form-card-body">
@@ -205,7 +215,17 @@
         </div>
       </div>
       <div class="form-actions">
-        <button type="submit" class="btn-action btn-primary btn-lg">
+        <button type="button" class="btn-action btn-primary btn-lg"
+          onclick="showConfirm({
+            title: 'Perbarui Password',
+            message: 'Apakah Anda yakin ingin mengubah password akun Anda? Pastikan Anda mengingat password baru.',
+            icon: 'bi-shield-lock-fill',
+            iconColor: '#0055A5',
+            confirmText: 'Ya, Perbarui',
+            confirmClass: 'confirm-btn-primary',
+            confirmIcon: 'bi-lock-fill',
+            onConfirm: function() { document.getElementById('form-profil-password').submit(); }
+          })">
           <i class="bi bi-lock-fill"></i> Perbarui Password
         </button>
       </div>

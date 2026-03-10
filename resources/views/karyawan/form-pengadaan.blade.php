@@ -22,7 +22,7 @@
     <p>Permintaan akan diteruskan ke <strong>Divisi Umum</strong>, kemudian diproses oleh <strong>Pejabat Pengadaan Barang & Jasa (PBJ)</strong>. Pilih jenis pengadaan yang sesuai di bawah ini.</p>
   </div>
 
-  <form method="POST" action="{{ route('karyawan.pengadaan.store') }}">
+  <form method="POST" action="{{ route('karyawan.pengadaan.store') }}" id="form-pengadaan">
     @csrf
     <input type="hidden" id="pengadaan-type-input" name="tipe_pengadaan" value="{{ old('tipe_pengadaan', 'restock') }}"/>
 
@@ -163,7 +163,17 @@
         <a href="{{ route('karyawan.dashboard') }}" class="btn-action btn-outline">
           <i class="bi bi-x"></i> Batal
         </a>
-        <button type="submit" class="btn-action btn-orange btn-lg">
+        <button type="button" class="btn-action btn-orange btn-lg"
+          onclick="showConfirm({
+            title: 'Konfirmasi Kirim Pengadaan',
+            message: 'Pastikan detail pengadaan sudah benar. Permintaan akan diteruskan ke Divisi Umum dan PBJ untuk diproses.',
+            icon: 'bi-bag-plus-fill',
+            iconColor: '#F07D00',
+            confirmText: 'Ya, Kirim',
+            confirmClass: 'confirm-btn-warning',
+            confirmIcon: 'bi-send-fill',
+            onConfirm: function() { document.getElementById('form-pengadaan').submit(); }
+          })">
           <i class="bi bi-send"></i> Kirim Permintaan Pengadaan
         </button>
       </div>

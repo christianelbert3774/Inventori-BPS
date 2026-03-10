@@ -159,7 +159,17 @@
                         <a href="{{ route('karyawan.dashboard') }}" class="btn btn-bps-outline">
                             <i class="bi bi-arrow-left me-1"></i> Batal
                         </a>
-                        <button type="submit" class="btn btn-bps">
+                        <button type="button" class="btn btn-bps"
+                          onclick="showConfirm({
+                            title: 'Konfirmasi Kirim Permintaan',
+                            message: 'Pastikan semua barang dan jumlah yang diminta sudah benar. Permintaan akan dikirim ke Admin Gudang untuk diproses.',
+                            icon: 'bi-send-fill',
+                            iconColor: '#0055A5',
+                            confirmText: 'Ya, Kirim',
+                            confirmClass: 'confirm-btn-primary',
+                            confirmIcon: 'bi-send-fill',
+                            onConfirm: function() { document.getElementById('form-permintaan').submit(); }
+                          })">
                             <i class="bi bi-send-fill me-2"></i> Kirim Permintaan
                         </button>
                     </div>
