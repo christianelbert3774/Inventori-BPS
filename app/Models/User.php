@@ -53,7 +53,7 @@ class User extends Authenticatable
 
     public function isDivisiUmum(): bool
     {
-        return $this->role === 'admin_gudang';
+        return $this->role === 'divisi_umum';
     }
 
     public function isPbj(): bool
