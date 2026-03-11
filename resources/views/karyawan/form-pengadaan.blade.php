@@ -66,23 +66,43 @@
         @endif
 
         {{-- TOGGLE --}}
-        <div class="type-toggle">
-          <button type="button" id="btn-type-restock"
+        <div class="type-toggle" style="display:flex;gap:16px;width:100%;">
+          <button type="button"
+                  id="btn-type-restock"
                   class="type-btn {{ old('tipe_pengadaan','restock') === 'restock' ? 'active' : '' }}"
-                  onclick="setPengadaanType('restock')">
-            <i class="bi bi-arrow-repeat"></i>
-            <div>
-              <div style="font-weight:700">Tambah Stok Barang yang Ada</div>
-              <div style="font-size:11.5px;font-weight:400;opacity:.8">Barang sudah terdaftar di inventori, stok perlu diisi ulang</div>
+                  onclick="setPengadaanType('restock')"
+                  style="
+                    flex:1;
+                    display:flex;
+                    align-items:center;
+                    gap:5px;
+                    padding:15px;
+                  ">
+            <i class="bi bi-arrow-repeat" style="font-size:20px;"></i>
+            <div style="flex:1;text-align:center;">
+              <div style="font-weight:700;">Tambah Stok Barang yang Ada</div>
+              <div style="font-size:11.5px;font-weight:400;opacity:.8;">
+                Barang sudah terdaftar di inventori, stok perlu diisi ulang
+              </div>
             </div>
           </button>
-          <button type="button" id="btn-type-baru"
+          <button type="button"
+                  id="btn-type-baru"
                   class="type-btn {{ old('tipe_pengadaan') === 'baru' ? 'active-orange' : '' }}"
-                  onclick="setPengadaanType('baru')">
-            <i class="bi bi-plus-square"></i>
-            <div>
-              <div style="font-weight:700">Pengadaan Barang Baru</div>
-              <div style="font-size:11.5px;font-weight:400;opacity:.8">Barang belum terdaftar di inventori, perlu pengadaan jenis baru</div>
+                  onclick="setPengadaanType('baru')"
+                  style="
+                    flex:1;
+                    display:flex;
+                    align-items:center;
+                    gap:5px;
+                    padding:15px;
+                  ">
+            <i class="bi bi-plus-square" style="font-size:20px;"></i>
+            <div style="flex:1;text-align:center;">
+              <div style="font-weight:700;">Pengadaan Barang Baru</div>
+              <div style="font-size:11.5px;font-weight:400;opacity:.8;">
+                Barang belum terdaftar di inventori, perlu pengadaan jenis baru
+              </div>
             </div>
           </button>
         </div>
