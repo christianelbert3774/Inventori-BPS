@@ -19,8 +19,11 @@ use App\Http\Controllers\Karyawan\ProfilController;
 
 // ── Controller Admin (Level 2) — BARU ──
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\KaryawanController as AdminKaryawanController;
+use App\Http\Controllers\Admin\NotifikasiController as AdminNotifikasiController;
 use App\Http\Controllers\Admin\PemakaianController as AdminPemakaianController;
 use App\Http\Controllers\Admin\PengadaanController as AdminPengadaanController;
+use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -93,4 +96,19 @@ Route::middleware(['auth', 'role:divisi_umum'])
         Route::get('/pengadaan/{pengadaan}',         [AdminPengadaanController::class, 'show'])->name('pengadaan.show');
         Route::patch('/pengadaan/{pengadaan}/approve',[AdminPengadaanController::class, 'approve'])->name('pengadaan.approve');
         Route::patch('/pengadaan/{pengadaan}/reject', [AdminPengadaanController::class, 'reject'])->name('pengadaan.reject');
+
+        // Manajemen Karyawan
+        Route::get('/karyawan',                         [AdminKaryawanController::class, 'index'])->name('karyawan.index');
+        Route::get('/karyawan/create',                  [AdminKaryawanController::class, 'create'])->name('karyawan.create');
+        Route::post('/karyawan',                        [AdminKaryawanController::class, 'store'])->name('karyawan.store');
+        Route::get('/karyawan/{karyawan}/history',      [AdminKaryawanController::class, 'history'])->name('karyawan.history');
+        Route::patch('/karyawan/{karyawan}/toggle-active',[AdminKaryawanController::class, 'toggleActive'])->name('karyawan.toggleActive');
+
+        // Notifikasi
+        Route::get('/notifikasi', [AdminNotifikasiController::class, 'index'])->name('notifikasi');
+
+        // Profil
+        Route::get('/profil',            [AdminProfilController::class, 'index'])->name('profil');
+        Route::patch('/profil',          [AdminProfilController::class, 'updateProfil'])->name('profil.update');
+        Route::patch('/profil/password', [AdminProfilController::class, 'updatePassword'])->name('profil.password');
     });

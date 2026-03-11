@@ -31,25 +31,37 @@ class AuthController extends Controller
      * Proses login.
      */
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
-        ], [
-            'email.required'    => 'Email wajib diisi.',
-            'email.email'       => 'Format email tidak valid.',
-            'password.required' => 'Password wajib diisi.',
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ], [
+        'email.required'    => 'Email wajib diisi.',
+        'email.email'       => 'Format email tidak valid.',
+        'password.required' => 'Password wajib diisi.',
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            return $this->redirectByRole(Auth::user());
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+
+        $user = Auth::user();
+
+        // CEK STATUS AKUN
+        if ($user->is_active != 1) {
+            Auth::logout();
+
+            return back()->withErrors([
+                'email' => 'Tidak dapat melakukan login, akun anda telah dinonaktifkan.'
+            ]);
         }
 
-        return back()
-            ->withErrors(['email' => 'Email atau password yang Anda masukkan salah.'])
-            ->onlyInput('email');
+        $request->session()->regenerate();
+        return $this->redirectByRole($user);
     }
+
+    return back()
+        ->withErrors(['email' => 'Email atau password yang Anda masukkan salah.'])
+        ->onlyInput('email');
+}
 
     /**
      * Proses logout.

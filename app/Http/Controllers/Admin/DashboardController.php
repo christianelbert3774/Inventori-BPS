@@ -9,79 +9,60 @@ use App\Models\Pengadaan;
 use Illuminate\Http\Request;
 
 /**
- * ┌─────────────────────────────────────────────────────────────┐
- * │  BARU — Admin\DashboardController.php                       │
- * │  Controller untuk Dashboard Level 2 (Divisi Umum /         │
- * │  Admin Gudang). Menampilkan statistik stok dan ringkasan    │
- * │  permintaan yang masuk dari Level 1.                        │
- * └─────────────────────────────────────────────────────────────┘
+ * DIMODIFIKASI — Admin\DashboardController.php
+ * Perubahan: Tambah query barang dengan filter dan pagination
+ * agar tabel stok di dashboard mendukung filter tersedia/hampir_habis/habis
  */
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // ── Statistik Barang ──
-        $totalBarang        = Barang::count();
-        $barangTersedia     = Barang::where('stok', '>', 10)->count();
-        $barangHampirHabis  = Barang::where('stok', '>', 0)->where('stok', '<=', 10)->count();
-        $barangHabis        = Barang::where('stok', 0)->count();
+        $totalBarang       = Barang::count();
+        $barangTersedia    = Barang::where('stok', '>', 10)->count();
+        $barangHampirHabis = Barang::where('stok', '>', 0)->where('stok', '<=', 10)->count();
+        $barangHabis       = Barang::where('stok', 0)->count();
+
+        // ── Tabel Stok dengan filter ──
+        $query = Barang::query()->orderBy('nama_barang');
+        if ($request->filter === 'tersedia')     $query->where('stok', '>', 10);
+        elseif ($request->filter === 'hampir_habis') $query->where('stok', '>', 0)->where('stok', '<=', 10);
+        elseif ($request->filter === 'habis')    $query->where('stok', 0);
+        $barangs = $query->paginate(8)->withQueryString();
 
         // ── Statistik Permintaan ──
-        $pemakaianMenunggu  = Pemakaian::where('status', 'pending')->count();
-        $pengadaanMenunggu  = Pengadaan::where('status_level2', 'pending')->count();
+        $pemakaianMenunggu = Pemakaian::where('status', 'pending')->count();
+        $pengadaanMenunggu = Pengadaan::where('status_level2', 'pending')->count();
 
-        // ── Aktivitas Terbaru (gabungan pemakaian + pengadaan) ──
-        // Ambil 5 pemakaian terbaru
-        $pemakaianTerbaru = Pemakaian::with(['user', 'details.barang'])
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                $namaBarang = $item->details->map(fn($d) => $d->barang->nama_barang ?? '-')->implode(', ');
-                return [
-                    'jenis'       => 'Pemakaian',
-                    'pemohon'     => $item->user->name ?? '-',
-                    'barang'      => $namaBarang ?: '-',
-                    'status'      => $item->status,
-                    'tanggal'     => $item->created_at,
-                    'id'          => $item->id,
-                    'route_detail'=> 'admin.pemakaian.show',
-                ];
-            });
+        // ── Aktivitas Terbaru ──
+        $pemakaianTerbaru = Pemakaian::with(['user', 'details.barang'])->latest()->limit(5)->get()
+            ->map(fn($item) => [
+                'jenis'        => 'Pemakaian',
+                'pemohon'      => $item->user->name ?? '-',
+                'barang'       => $item->details->map(fn($d) => $d->barang->nama_barang ?? '-')->implode(', '),
+                'status'       => $item->status,
+                'tanggal'      => $item->created_at,
+                'id'           => $item->id,
+                'route_detail' => 'admin.pemakaian.show',
+            ]);
 
-        // Ambil 5 pengadaan terbaru
-        $pengadaanTerbaru = Pengadaan::with(['user', 'details.barang'])
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                $namaBarang = $item->details->map(fn($d) => $d->barang->nama_barang ?? '-')->implode(', ');
-                return [
-                    'jenis'       => 'Pengadaan',
-                    'pemohon'     => $item->user->name ?? '-',
-                    'barang'      => $namaBarang ?: '-',
-                    'status'      => $item->status_level2,
-                    'tanggal'     => $item->created_at,
-                    'id'          => $item->id,
-                    'route_detail'=> 'admin.pengadaan.show',
-                ];
-            });
+        $pengadaanTerbaru = Pengadaan::with(['user', 'details.barang'])->latest()->limit(5)->get()
+            ->map(fn($item) => [
+                'jenis'        => 'Pengadaan',
+                'pemohon'      => $item->user->name ?? '-',
+                'barang'       => $item->details->map(fn($d) => $d->barang->nama_barang ?? '-')->implode(', '),
+                'status'       => $item->status_level2,
+                'tanggal'      => $item->created_at,
+                'id'           => $item->id,
+                'route_detail' => 'admin.pengadaan.show',
+            ]);
 
-        // Gabung dan urutkan berdasarkan tanggal terbaru
-        $aktivitasTerbaru = $pemakaianTerbaru
-            ->concat($pengadaanTerbaru)
-            ->sortByDesc('tanggal')
-            ->take(8)
-            ->values();
+        $aktivitasTerbaru = $pemakaianTerbaru->concat($pengadaanTerbaru)
+            ->sortByDesc('tanggal')->take(8)->values();
 
         return view('admin.dashboard', compact(
-            'totalBarang',
-            'barangTersedia',
-            'barangHampirHabis',
-            'barangHabis',
-            'pemakaianMenunggu',
-            'pengadaanMenunggu',
-            'aktivitasTerbaru'
+            'totalBarang', 'barangTersedia', 'barangHampirHabis', 'barangHabis',
+            'barangs', 'pemakaianMenunggu', 'pengadaanMenunggu', 'aktivitasTerbaru'
         ));
     }
 }
