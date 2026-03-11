@@ -25,7 +25,11 @@
   {{-- Template options for JS --}}
   <template id="barang-options-template">
     @foreach($barangs as $barang)
-      <option value="{{ $barang->id }}" {{ $barang->stok == 0 ? 'disabled' : '' }}>
+      <option value="{{ $barang->id }}"
+        data-stok="{{ $barang->stok }}"
+        data-satuan="{{ $barang->satuan }}"
+        data-nama="{{ $barang->nama_barang }}"
+        {{ $barang->stok == 0 ? 'disabled' : '' }}>
         {{ $barang->nama_barang }} — Stok: {{ $barang->stok }} {{ $barang->satuan }}
         {{ $barang->stok == 0 ? '(Habis)' : '' }}
       </option>
@@ -83,10 +87,13 @@
             <div class="form-grid-2">
               <div class="form-group">
                 <label>Pilih Barang <span class="req">*</span></label>
-                <select class="form-control" name="barang_id[]" required>
+                <select class="form-control" name="barang_id[]" required data-custom-select>
                   <option value="">-- Pilih Barang --</option>
                   @foreach($barangs as $barang)
                     <option value="{{ $barang->id }}"
+                      data-stok="{{ $barang->stok }}"
+                      data-satuan="{{ $barang->satuan }}"
+                      data-nama="{{ $barang->nama_barang }}"
                       {{ request('barang_id') == $barang->id ? 'selected' : '' }}
                       {{ $barang->stok == 0 ? 'disabled' : '' }}>
                       {{ $barang->nama_barang }} — Stok: {{ $barang->stok }} {{ $barang->satuan }}
