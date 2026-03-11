@@ -15,7 +15,7 @@
       <span class="current">Dashboard</span>
     </div>
     <h2>Selamat Datang, {{ auth()->user()->name }}! 👋</h2>
-    <p>{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }} · Berikut ringkasan inventori barang saat ini.</p>
+    <p>{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }} · Sistem Inventori - Karyawan</p>
   </div>
 
   {{-- STAT CARDS --}}
