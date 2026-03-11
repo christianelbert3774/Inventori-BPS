@@ -92,10 +92,14 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label>Pilih Barang <span class="req">*</span></label>
-              <select class="form-control" name="barang_id" data-required>
+              <select class="form-control" name="barang_id" data-required data-custom-select>
                 <option value="">-- Pilih Barang --</option>
                 @foreach($barangs as $barang)
-                  <option value="{{ $barang->id }}" {{ old('barang_id') == $barang->id ? 'selected' : '' }}>
+                  <option value="{{ $barang->id }}"
+                    data-stok="{{ $barang->stok }}"
+                    data-satuan="{{ $barang->satuan }}"
+                    data-nama="{{ $barang->nama_barang }}"
+                    {{ old('barang_id') == $barang->id ? 'selected' : '' }}>
                     {{ $barang->nama_barang }}
                     (Stok saat ini: {{ $barang->stok }} {{ $barang->satuan }})
                   </option>
