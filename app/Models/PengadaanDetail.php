@@ -10,8 +10,13 @@ class PengadaanDetail extends Model
 
     protected $fillable = [
         'pengadaan_id',
-        'barang_id',
+        'tipe_item',        // 'restock' atau 'baru'
+        'barang_id',        // nullable jika tipe_item = 'baru' (belum ada barang)
+        'nama_barang_baru', // hanya diisi jika tipe_item = 'baru'
+        'satuan_baru',      // hanya diisi jika tipe_item = 'baru'
+        'kategori_baru',    // hanya diisi jika tipe_item = 'baru'
         'jumlah',
+        'alasan',
     ];
 
     // ── RELATIONSHIPS ──

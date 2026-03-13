@@ -108,20 +108,33 @@
               @foreach($pengadaan->details as $i => $detail)
                 <tr>
                   <td style="color:#94A3B8;">{{ $i + 1 }}</td>
-                  <td style="font-weight:600;color:#1E293B;">{{ $detail->barang->nama_barang ?? '-' }}</td>
-                  <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:#0055A5;">{{ $detail->barang->kode_barang ?? '-' }}</span></td>
+                  <td style="font-weight:600;color:#1E293B;">
+                    @if($detail->tipe_item === 'baru')
+                      {{ $detail->nama_barang_baru }}
+                      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;background:#FEF3C7;color:#92400E;margin-left:4px;">BARU</span>
+                    @else
+                      {{ $detail->barang->nama_barang ?? '-' }}
+                    @endif
+                  </td>
+                  <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:#0055A5;">{{ $detail->barang->kode_barang ?? ($detail->tipe_item === 'baru' ? 'Belum ada' : '-') }}</span></td>
                   <td>
                     <span style="font-weight:700;color:#1D4ED8;">
                       {{ $detail->jumlah }}
                     </span>
                   </td>
                   <td>
-                    @php $stok = $detail->barang->stok ?? 0; @endphp
-                    <span style="font-weight:600;color:{{ $stok === 0 ? '#DC2626' : ($stok <= 10 ? '#D97706' : '#059669') }}">
-                      {{ $stok }}
-                    </span>
+                    @if($detail->tipe_item === 'baru' && !$detail->barang_id)
+                      <span style="font-size:12px;color:#D97706;">Menunggu PBJ</span>
+                    @else
+                      @php $stok = $detail->barang->stok ?? 0; @endphp
+                      <span style="font-weight:600;color:{{ $stok === 0 ? '#DC2626' : ($stok <= 10 ? '#D97706' : '#059669') }}">
+                        {{ $stok }}
+                      </span>
+                    @endif
                   </td>
-                  <td style="font-size:12px;color:#64748B;">{{ $detail->barang->satuan ?? '-' }}</td>
+                  <td style="font-size:12px;color:#64748B;">
+                    {{ $detail->tipe_item === 'baru' ? $detail->satuan_baru : ($detail->barang->satuan ?? '-') }}
+                  </td>
                 </tr>
               @endforeach
             </tbody>

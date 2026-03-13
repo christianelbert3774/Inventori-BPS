@@ -289,8 +289,8 @@
           </div>
           @foreach($p->details as $d)
             <div style="font-size:13px;font-weight:600;color:var(--text-primary)">
-              {{ $d->barang->nama_barang }}
-              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+              {{ $d->barang->nama_barang ?? '-' }}
+              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? '' }}</span>
             </div>
           @endforeach
           <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px">
@@ -332,8 +332,8 @@
           </div>
           @foreach($p->details as $d)
             <div style="font-size:13px;font-weight:600;color:var(--text-primary)">
-              {{ $d->barang->nama_barang }}
-              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+              {{ $d->barang->nama_barang ?? $d->nama_barang_baru ?? 'Barang Baru' }}
+              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? $d->satuan_baru ?? '' }}</span>
             </div>
           @endforeach
           <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px">

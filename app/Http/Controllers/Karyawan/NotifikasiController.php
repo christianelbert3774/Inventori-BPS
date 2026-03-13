@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
  *  1. index() sekarang mencatat notif_read_at = now() saat halaman notifikasi dibuka
  *  2. getBadgeCount() sekarang hanya menghitung notifikasi yang updated_at
  *     LEBIH BARU dari notif_read_at user → badge hilang setelah halaman dibuka
+ *
+ * BUGFIX: Kolom barang_id di pengadaan_detail bisa NULL untuk item tipe 'baru'
+ * yang belum selesai diproses PBJ. Gunakan null-coalescing agar tidak error.
  */
 class NotifikasiController extends Controller
 {
@@ -21,7 +24,6 @@ class NotifikasiController extends Controller
         $user = Auth::user();
 
         // ── FIX BUG: Catat waktu user membuka halaman notifikasi ──
-        // Ini yang membuat badge dot merah hilang setelah halaman dibuka
         $user->update(['notif_read_at' => now()]);
 
         // Pemakaian yang statusnya berubah (approved/rejected)
@@ -49,7 +51,10 @@ class NotifikasiController extends Controller
                 'type'    => 'pemakaian',
                 'id'      => $p->id,
                 'status'  => $p->status,
-                'barangs' => $p->details->map(fn($d) => $d->barang->nama_barang . ' ×' . $d->jumlah)->join(', '),
+                'barangs' => $p->details->map(function ($d) {
+                    $nama = $d->barang->nama_barang ?? 'Barang';
+                    return $nama . ' ×' . $d->jumlah;
+                })->join(', '),
                 'by'      => $p->approvedBy?->name ?? '—',
                 'time'    => $p->updated_at,
             ]);
@@ -64,7 +69,11 @@ class NotifikasiController extends Controller
                 'type'    => 'pengadaan',
                 'id'      => $p->id,
                 'status'  => $status,
-                'barangs' => $p->details->map(fn($d) => $d->barang->nama_barang . ' ×' . $d->jumlah)->join(', '),
+                // BUGFIX: barang_id bisa NULL untuk item tipe 'baru' yang belum diproses PBJ
+                'barangs' => $p->details->map(function ($d) {
+                    $nama = $d->barang->nama_barang ?? $d->nama_barang_baru ?? 'Barang Baru';
+                    return $nama . ' ×' . $d->jumlah;
+                })->join(', '),
                 'by'      => '—',
                 'time'    => $p->updated_at,
             ]);
@@ -90,7 +99,6 @@ class NotifikasiController extends Controller
 
         $user      = Auth::user();
         $readAt    = $user->notif_read_at;
-        // Jika belum pernah buka notifikasi, gunakan 7 hari sebagai batas
         $threshold = $readAt ?? now()->subDays(7);
 
         $pemakaian = Pemakaian::where('user_id', $user->id)

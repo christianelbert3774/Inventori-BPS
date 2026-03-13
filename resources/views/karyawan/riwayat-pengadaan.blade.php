@@ -53,8 +53,14 @@
               <td>
                 @foreach($p->details as $d)
                   <div style="font-size:13px">
-                    <span class="item-name">{{ $d->barang->nama_barang }}</span>
-                    <span style="color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+                    @if($d->tipe_item === 'baru' && !$d->barang_id)
+                      <span class="item-name">{{ $d->nama_barang_baru }}</span>
+                      <span style="color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->satuan_baru }}</span>
+                      <span style="font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;background:#FEF3C7;color:#92400E;margin-left:4px;">BARU</span>
+                    @else
+                      <span class="item-name">{{ $d->barang->nama_barang ?? '-' }}</span>
+                      <span style="color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? '' }}</span>
+                    @endif
                   </div>
                 @endforeach
               </td>

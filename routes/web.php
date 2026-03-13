@@ -25,6 +25,9 @@ use App\Http\Controllers\Admin\PemakaianController as AdminPemakaianController;
 use App\Http\Controllers\Admin\PengadaanController as AdminPengadaanController;
 use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 
+// ── Controller PBJ (Level 3) ──
+use App\Http\Controllers\Pbj\PengadaanController as PbjPengadaanController;
+
 use Illuminate\Support\Facades\Route;
 
 // ── REDIRECT ROOT ──
@@ -111,4 +114,17 @@ Route::middleware(['auth', 'role:divisi_umum'])
         Route::get('/profil',            [AdminProfilController::class, 'index'])->name('profil');
         Route::patch('/profil',          [AdminProfilController::class, 'updateProfil'])->name('profil.update');
         Route::patch('/profil/password', [AdminProfilController::class, 'updatePassword'])->name('profil.password');
+    });
+
+// ── PBJ PORTAL (Level 3 — Pengadaan Barang & Jasa) ──
+// Role 'pbj' menangani pengadaan yang sudah disetujui Divisi Umum.
+// PENTING: Barang baru HANYA dibuat ke tabel 'barang' di sini (setelah PBJ selesai belanja).
+Route::middleware(['auth', 'role:pbj'])
+    ->prefix('pbj')
+    ->name('pbj.')
+    ->group(function () {
+        Route::get('/pengadaan',                         [PbjPengadaanController::class, 'index'])->name('pengadaan.index');
+        Route::get('/pengadaan/{pengadaan}',             [PbjPengadaanController::class, 'show'])->name('pengadaan.show');
+        Route::patch('/pengadaan/{pengadaan}/complete',  [PbjPengadaanController::class, 'complete'])->name('pengadaan.complete');
+        Route::patch('/pengadaan/{pengadaan}/reject',    [PbjPengadaanController::class, 'reject'])->name('pengadaan.reject');
     });

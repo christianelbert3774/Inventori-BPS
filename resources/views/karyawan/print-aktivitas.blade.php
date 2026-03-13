@@ -338,8 +338,8 @@
               <td class="mono">#{{ str_pad($p->id, 5, '0', STR_PAD_LEFT) }}</td>
               <td>
                 @foreach($p->details as $d)
-                  <div class="fw6">{{ $d->barang->nama_barang }}
-                    <span style="font-weight:400;color:var(--gray)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+                  <div class="fw6">{{ $d->barang->nama_barang ?? $d->nama_barang_baru ?? 'Barang Baru' }}
+                    <span style="font-weight:400;color:var(--gray)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? $d->satuan_baru ?? '' }}</span>
                   </div>
                 @endforeach
               </td>
@@ -390,8 +390,8 @@
               <td class="mono">#{{ str_pad($p->id, 5, '0', STR_PAD_LEFT) }}</td>
               <td>
                 @foreach($p->details as $d)
-                  <div class="fw6">{{ $d->barang->nama_barang }}
-                    <span style="font-weight:400;color:var(--gray)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+                  <div class="fw6">{{ $d->barang->nama_barang ?? $d->nama_barang_baru ?? 'Barang Baru' }}
+                    <span style="font-weight:400;color:var(--gray)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? $d->satuan_baru ?? '' }}</span>
                   </div>
                 @endforeach
               </td>
