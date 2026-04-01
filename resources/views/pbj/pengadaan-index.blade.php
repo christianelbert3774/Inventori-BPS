@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.pbj')
 
 @section('title', 'Pengadaan - PBJ')
 
@@ -49,7 +49,8 @@
             <th>Pemohon</th>
             <th>Tanggal Pengajuan</th>
             <th>Jumlah Item</th>
-            <th>Status</th>
+            <th>Status PBJ</th>
+            <th>Verifikasi Admin</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -68,6 +69,17 @@
                 <span style="font-weight:600;color:{{ $clr }};">{{ $lbl }}</span>
               </td>
               <td>
+                @if($p->status_level3 === 'completed')
+                  @php
+                    $vMap = ['belum'=>['Menunggu Verifikasi','#D97706'], 'verified'=>['Terverifikasi','#059669'], 'rejected'=>['Ditolak','#DC2626']];
+                    [$vLbl, $vClr] = $vMap[$p->status_admin_verifikasi] ?? ['-','#94A3B8'];
+                  @endphp
+                  <span style="font-weight:600;color:{{ $vClr }};font-size:12px;">{{ $vLbl }}</span>
+                @else
+                  <span style="color:#94A3B8;font-size:12px;">—</span>
+                @endif
+              </td>
+              <td>
                 <a href="{{ route('pbj.pengadaan.show', $p->id) }}"
                    style="font-size:12px;font-weight:600;color:#0055A5;text-decoration:none;">
                   <i class="bi bi-eye"></i> Detail
@@ -76,7 +88,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="6" style="text-align:center;color:#94A3B8;padding:32px;">
+              <td colspan="7" style="text-align:center;color:#94A3B8;padding:32px;">
                 Tidak ada data pengadaan.
               </td>
             </tr>

@@ -16,6 +16,7 @@ class PengadaanDetail extends Model
         'satuan_baru',      // hanya diisi jika tipe_item = 'baru'
         'kategori_baru',    // hanya diisi jika tipe_item = 'baru'
         'jumlah',
+        'jumlah_realisasi', // diisi oleh PBJ saat menyelesaikan
         'alasan',
     ];
 

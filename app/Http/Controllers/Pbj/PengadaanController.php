@@ -9,29 +9,30 @@ use App\Models\PengadaanDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * ┌──────────────────────────────────────────────────────────────┐
  * │  PBJ\PengadaanController.php                                 │
  * │  Controller Level 3 (PBJ) untuk menyelesaikan pengadaan.    │
  * │                                                              │
- * │  Alur yang benar:                                            │
+ * │  Alur baru:                                                  │
  * │   1. Karyawan submit form pengadaan → status pending         │
  * │   2. Divisi Umum approve → status_level2 = approved          │
- * │   3. PBJ melihat daftar, lalu klik "Selesaikan"             │
- * │      → BARU DI SINI Barang dibuat / stok ditambah            │
+ * │   3. PBJ input realisasi + upload foto bukti                 │
+ * │      → status_level3 = completed                             │
+ * │   4. Admin verifikasi → baru di sini stok ditambahkan        │
  * └──────────────────────────────────────────────────────────────┘
  */
 class PengadaanController extends Controller
 {
     /**
-     * Daftar permintaan pengadaan yang sudah di-approve Divisi Umum
-     * dan menunggu ditindaklanjuti PBJ.
+     * Daftar permintaan pengadaan yang sudah di-approve Divisi Umum.
      */
     public function index(Request $request)
     {
         $query = Pengadaan::with(['user', 'details.barang'])
-            ->where('status_level2', 'approved') // hanya yang sudah disetujui
+            ->where('status_level2', 'approved')
             ->latest();
 
         if ($request->filled('status')) {
@@ -54,10 +55,12 @@ class PengadaanController extends Controller
 
     /**
      * Selesaikan pengadaan:
-     *   - Untuk item 'restock': tambahkan stok barang yang sudah ada
-     *   - Untuk item 'baru'   : buat record Barang baru di tabel barang, lalu set stoknya
+     *   - Simpan jumlah realisasi per item
+     *   - Upload foto bukti
+     *   - Simpan catatan PBJ
+     *   - Set status_level3 = 'completed'
      *
-     * INI adalah satu-satunya tempat di mana Barang baru dibuat ke tabel barang.
+     * STOK BELUM DITAMBAHKAN di sini — Admin yang akan verifikasi dan menambah stok.
      */
     public function complete(Request $request, Pengadaan $pengadaan)
     {
@@ -69,52 +72,45 @@ class PengadaanController extends Controller
             return back()->with('error', 'Pengadaan ini sudah diselesaikan.');
         }
 
-        // Validasi jumlah realisasi untuk setiap detail
-        $rules = [];
+        // Validasi
+        $rules = [
+            'foto_bukti'  => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'catatan_pbj' => ['nullable', 'string', 'max:1000'],
+        ];
         foreach ($pengadaan->details as $detail) {
             $rules["jumlah_realisasi.{$detail->id}"] = ['required', 'integer', 'min:0'];
         }
         $request->validate($rules, [
+            'foto_bukti.required'         => 'Foto bukti pembelian wajib diunggah.',
+            'foto_bukti.image'            => 'File harus berupa gambar.',
+            'foto_bukti.mimes'            => 'Format gambar: JPG, PNG, atau WebP.',
+            'foto_bukti.max'              => 'Ukuran file maksimal 5 MB.',
             'jumlah_realisasi.*.required' => 'Jumlah realisasi wajib diisi.',
             'jumlah_realisasi.*.min'      => 'Jumlah tidak boleh negatif.',
         ]);
 
         DB::transaction(function () use ($request, $pengadaan) {
+            // Upload foto bukti
+            $path = $request->file('foto_bukti')->store('bukti-pengadaan', 'public');
+
+            // Simpan jumlah realisasi per detail
             foreach ($pengadaan->details as $detail) {
                 $jumlahRealisasi = (int) $request->input("jumlah_realisasi.{$detail->id}", 0);
-
-                if ($jumlahRealisasi <= 0) {
-                    continue; // skip jika tidak ada yang dibeli
-                }
-
-                if ($detail->tipe_item === 'baru') {
-                    // ── BARANG BARU: baru sekarang dibuat di tabel barang ──
-                    $barang = Barang::create([
-                        'kode_barang' => Barang::generateKode(),
-                        'nama_barang' => $detail->nama_barang_baru,
-                        'satuan'      => $detail->satuan_baru,
-                        'stok'        => $jumlahRealisasi,
-                    ]);
-
-                    // Update detail: isi barang_id sekarang barang sudah ada
-                    $detail->update(['barang_id' => $barang->id]);
-
-                } else {
-                    // ── RESTOCK: tambah stok barang yang sudah ada ──
-                    $detail->barang->increment('stok', $jumlahRealisasi);
-                }
+                $detail->update(['jumlah_realisasi' => $jumlahRealisasi]);
             }
 
-            // Update status pengadaan selesai
+            // Update pengadaan
             $pengadaan->update([
                 'status_level3'       => 'completed',
                 'processed_by_level3' => Auth::id(),
                 'completed_at'        => now(),
+                'foto_bukti'          => $path,
+                'catatan_pbj'         => $request->input('catatan_pbj'),
             ]);
         });
 
         return redirect()->route('pbj.pengadaan.index')
-            ->with('success', 'Pengadaan berhasil diselesaikan. Stok barang telah diperbarui.');
+            ->with('success', 'Pengadaan berhasil diselesaikan. Menunggu verifikasi dari Admin.');
     }
 
     /**
