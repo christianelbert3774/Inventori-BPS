@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 
 // ── Controller PBJ (Level 3) ──
 use App\Http\Controllers\Pbj\DashboardController as PbjDashboardController;
+use App\Http\Controllers\Pbj\NotifikasiController as PbjNotifikasiController;
 use App\Http\Controllers\Pbj\PengadaanController as PbjPengadaanController;
 use App\Http\Controllers\Pbj\ProfilController as PbjProfilController;
 
@@ -128,6 +129,9 @@ Route::middleware(['auth', 'role:pejabat_pengadaan'])
         Route::get('/pengadaan/{pengadaan}', [PbjPengadaanController::class , 'show'])->name('pengadaan.show');
         Route::patch('/pengadaan/{pengadaan}/complete', [PbjPengadaanController::class , 'complete'])->name('pengadaan.complete');
         Route::patch('/pengadaan/{pengadaan}/reject', [PbjPengadaanController::class , 'reject'])->name('pengadaan.reject');
+
+        // Notifikasi
+        Route::get('/notifikasi', [PbjNotifikasiController::class , 'index'])->name('notifikasi');
 
         // Profil
         Route::get('/profil', [PbjProfilController::class , 'index'])->name('profil');

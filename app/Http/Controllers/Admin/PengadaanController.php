@@ -28,8 +28,30 @@ class PengadaanController extends Controller
     {
         $query = Pengadaan::with(['user', 'details.barang'])->latest();
 
-        if ($request->filled('status') && in_array($request->status, ['pending', 'approved', 'rejected'])) {
-            $query->where('status_level2', $request->status);
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'pending':
+                    $query->where('status_level2', 'pending');
+                    break;
+                case 'diproses_pbj':
+                    $query->where('status_level2', 'approved')
+                          ->where(function($q) {
+                              $q->where('status_level3', 'pending')
+                                ->orWhere('status_level3', 'processing');
+                          });
+                    break;
+                case 'menunggu_verifikasi':
+                    $query->where('status_level2', 'approved')
+                          ->where('status_level3', 'completed')
+                          ->where('status_admin_verifikasi', 'belum');
+                    break;
+                case 'approved':
+                    $query->where('status_level2', 'approved');
+                    break;
+                case 'rejected':
+                    $query->where('status_level2', 'rejected');
+                    break;
+            }
         }
 
         if ($request->filled('q')) {

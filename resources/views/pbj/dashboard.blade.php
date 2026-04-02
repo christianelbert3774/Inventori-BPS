@@ -43,6 +43,27 @@
     </div>
   </div>
 
+  {{-- QUICK ACTIONS --}}
+  <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.8px;">Aksi Cepat</div>
+  <div class="quick-actions" style="margin-bottom:24px;">
+    <a href="{{ route('pbj.pengadaan.index', ['status' => 'pending']) }}" class="qa-card">
+      <div class="qa-icon orange"><i class="bi bi-hourglass-split"></i></div>
+      <div class="qa-info">
+        <h4>Lihat Pengadaan Menunggu</h4>
+        <p>{{ $pending }} permintaan yang perlu ditindaklanjuti</p>
+      </div>
+      <i class="bi bi-chevron-right" style="color:var(--text-secondary);margin-left:auto"></i>
+    </a>
+    <a href="{{ route('pbj.pengadaan.index') }}" class="qa-card">
+      <div class="qa-icon blue"><i class="bi bi-list-ul"></i></div>
+      <div class="qa-info">
+        <h4>Semua Pengadaan</h4>
+        <p>Lihat seluruh riwayat dan status pengadaan</p>
+      </div>
+      <i class="bi bi-chevron-right" style="color:var(--text-secondary);margin-left:auto"></i>
+    </a>
+  </div>
+
   {{-- PENGADAAN TERBARU --}}
   <div class="card">
     <div class="card-header">
@@ -54,19 +75,19 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>#</th><th>Pemohon</th><th>Barang</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>
+          <tr><th>#</th><th>Pemohon</th><th>Barang</th><th>Tanggal</th><th>Status PBJ</th><th>Verifikasi Admin</th><th>Aksi</th></tr>
         </thead>
         <tbody>
           @forelse($terbaru as $p)
             <tr>
               <td style="color:#94A3B8;">{{ $p->id }}</td>
-              <td style="font-weight:600;">{{ $p->user->name ?? '-' }}</td>
+              <td><div style="font-weight:600;color:#1E293B;">{{ $p->user->name ?? '-' }}</div></td>
               <td style="font-size:13px;color:#475569;max-width:200px;">
                 <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                   {{ $p->details->map(fn($d) => $d->tipe_item === 'baru' ? $d->nama_barang_baru : ($d->barang->nama_barang ?? '-'))->implode(', ') }}
                 </div>
               </td>
-              <td style="font-size:12px;color:#94A3B8;">{{ $p->created_at->format('d/m/Y') }}</td>
+              <td style="font-size:12px;color:#94A3B8;">{{ $p->created_at->format('d/m/Y H:i') }}</td>
               <td>
                 @php
                   $map = ['pending'=>['Menunggu','badge-pending'], 'completed'=>['Selesai','badge-approved'], 'rejected'=>['Ditolak','badge-rejected']];
@@ -75,13 +96,24 @@
                 <span class="status-badge {{ $cls }}">{{ $lbl }}</span>
               </td>
               <td>
+                @if($p->status_level3 === 'completed')
+                  @php
+                    $vMap = ['belum'=>['Menunggu Verifikasi','badge-verify'], 'verified'=>['Terverifikasi','badge-approved'], 'rejected'=>['Ditolak','badge-rejected']];
+                    [$vLbl, $vCls] = $vMap[$p->status_admin_verifikasi] ?? ['—',''];
+                  @endphp
+                  <span class="status-badge {{ $vCls }}">{{ $vLbl }}</span>
+                @else
+                  <span style="color:#94A3B8;font-size:12px;">—</span>
+                @endif
+              </td>
+              <td>
                 <a href="{{ route('pbj.pengadaan.show', $p->id) }}" class="btn-detail">
                   <i class="bi bi-eye"></i> Detail
                 </a>
               </td>
             </tr>
           @empty
-            <tr><td colspan="6"><div class="empty-state"><i class="bi bi-inbox"></i><h4>Belum Ada Pengadaan</h4></div></td></tr>
+            <tr><td colspan="7"><div class="empty-state"><i class="bi bi-inbox"></i><h4>Belum Ada Pengadaan</h4><p>Belum ada pengadaan yang masuk untuk diproses.</p></div></td></tr>
           @endforelse
         </tbody>
       </table>

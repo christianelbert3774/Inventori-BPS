@@ -33,6 +33,10 @@ class DashboardController extends Controller
         // ── Statistik Permintaan ──
         $pemakaianMenunggu = Pemakaian::where('status', 'pending')->count();
         $pengadaanMenunggu = Pengadaan::where('status_level2', 'pending')->count();
+        $pengadaanVerifikasi = Pengadaan::where('status_level2', 'approved')
+            ->where('status_level3', 'completed')
+            ->where('status_admin_verifikasi', 'belum')
+            ->count();
 
         // ── Aktivitas Terbaru ──
         $pemakaianTerbaru = Pemakaian::with(['user', 'details.barang'])->latest()->limit(5)->get()
@@ -62,7 +66,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'totalBarang', 'barangTersedia', 'barangHampirHabis', 'barangHabis',
-            'barangs', 'pemakaianMenunggu', 'pengadaanMenunggu', 'aktivitasTerbaru'
+            'barangs', 'pemakaianMenunggu', 'pengadaanMenunggu', 'pengadaanVerifikasi', 'aktivitasTerbaru'
         ));
     }
 }

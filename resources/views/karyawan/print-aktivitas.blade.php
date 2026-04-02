@@ -409,8 +409,12 @@
                 @endif
               </td>
               <td>
-                @if($p->status_level3 === 'completed')
+                @if($p->status_level2 === 'rejected')
+                  <span style="color:var(--gray)">-</span>
+                @elseif($p->status_level3 === 'completed')
                   <span class="badge badge-ok">Selesai</span>
+                @elseif($p->status_level3 === 'rejected')
+                  <span class="badge badge-no">Ditolak</span>
                 @else
                   <span class="badge badge-wait">Menunggu</span>
                 @endif

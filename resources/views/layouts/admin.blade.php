@@ -22,6 +22,8 @@
     .badge-approved { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
     .badge-rejected { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
     .badge-forwarded{ background:#DBEAFE; color:#1E40AF; border:1px solid #BFDBFE; }
+    .badge-verify   { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; animation: pulse-verify 2s ease-in-out infinite; }
+    @keyframes pulse-verify { 0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.3)} 50%{box-shadow:0 0 0 6px rgba(217,119,6,0)} }
     .status-badge {
       display:inline-flex; align-items:center; gap:5px;
       font-size:11px; font-weight:600; padding:4px 10px;

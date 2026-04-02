@@ -105,7 +105,7 @@
   <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>#</th><th>Tanggal</th><th>Barang</th><th>Jumlah</th><th>Status L2</th><th>Aksi</th></tr>
+        <tr><th>#</th><th>Tanggal</th><th>Barang</th><th>Jumlah</th><th>Status</th><th>Aksi</th></tr>
       </thead>
       <tbody>
         @forelse($pengadaans as $idx => $p)
@@ -129,8 +129,27 @@
               @endforeach
             </td>
             <td>
-              @php $sm=['pending'=>['Menunggu','badge-pending'],'approved'=>['Diteruskan','badge-forwarded'],'rejected'=>['Ditolak','badge-rejected']];[$l,$c]=$sm[$p->status_level2]??['-',''];@endphp
-              <span class="status-badge {{ $c }}">{{ $l }}</span>
+              @if($p->status_level2 === 'pending')
+                <span class="status-badge badge-pending">Menunggu</span>
+              @elseif($p->status_level2 === 'rejected')
+                <span class="status-badge badge-rejected">Ditolak</span>
+              @elseif($p->status_level2 === 'approved')
+                @if($p->status_level3 === 'completed')
+                  @if($p->status_admin_verifikasi === 'verified')
+                    <span class="status-badge badge-approved">Terverifikasi</span>
+                  @elseif($p->status_admin_verifikasi === 'rejected')
+                    <span class="status-badge badge-rejected">Verifikasi Ditolak</span>
+                  @else
+                    <span class="status-badge badge-forwarded">Menunggu Verifikasi</span>
+                  @endif
+                @elseif($p->status_level3 === 'rejected')
+                  <span class="status-badge badge-rejected">Ditolak PBJ</span>
+                @elseif($p->status_level3 === 'processing')
+                  <span class="status-badge badge-forwarded">Diproses PBJ</span>
+                @else
+                  <span class="status-badge badge-forwarded">Diteruskan ke PBJ</span>
+                @endif
+              @endif
             </td>
             <td><a href="{{ route('admin.pengadaan.show', $p->id) }}" class="btn-detail"><i class="bi bi-eye"></i> Detail</a></td>
           </tr>

@@ -17,6 +17,49 @@
     <p>Daftar semua permintaan pemakaian barang yang pernah Anda ajukan.</p>
   </div>
 
+  {{-- SUMMARY STATS --}}
+  @php
+    $allPemakaians = \App\Models\Pemakaian::where('user_id', auth()->id());
+    $totalSemua = (clone $allPemakaians)->count();
+    $totalPending = (clone $allPemakaians)->where('status', 'pending')->count();
+    $totalApproved = (clone $allPemakaians)->where('status', 'approved')->count();
+    $totalRejected = (clone $allPemakaians)->where('status', 'rejected')->count();
+  @endphp
+  <div class="stat-grid" style="margin-bottom:20px;">
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="bi bi-cart-check"></i></div>
+      <div class="stat-info">
+        <div class="num">{{ $totalSemua }}</div>
+        <div class="lbl">Total Permintaan</div>
+        <div class="change up">Semua pemakaian</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+      <div class="stat-info">
+        <div class="num" style="color:#D97706;">{{ $totalPending }}</div>
+        <div class="lbl">Menunggu</div>
+        <div class="change" style="color:#D97706;">Belum diproses</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+      <div class="stat-info">
+        <div class="num">{{ $totalApproved }}</div>
+        <div class="lbl">Disetujui</div>
+        <div class="change up">Berhasil diproses</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><i class="bi bi-x-circle"></i></div>
+      <div class="stat-info">
+        <div class="num">{{ $totalRejected }}</div>
+        <div class="lbl">Ditolak</div>
+        <div class="change down">Tidak disetujui</div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">
       <div>
@@ -77,12 +120,17 @@
           @empty
             <tr>
               <td colspan="5">
-                <div class="empty-state">
-                  <i class="bi bi-cart-x"></i>
-                  <h4>Belum Ada Permintaan</h4>
-                  <p>Anda belum pernah mengajukan permintaan pemakaian barang.</p>
-                  <a href="{{ route('karyawan.pemakaian.create') }}" class="btn-action btn-primary" style="margin-top:12px;display:inline-flex">
-                    <i class="bi bi-plus"></i> Ajukan Sekarang
+                <div class="empty-state" style="padding:40px 24px;">
+                  <div
+                    style="width:64px;height:64px;border-radius:50%;background:rgba(0,85,165,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                    <i class="bi bi-cart-x" style="font-size:28px;opacity:.4;margin:0;display:block;"></i>
+                  </div>
+                  <h4 style="font-size:14px;">Belum Ada Permintaan</h4>
+                  <p style="max-width:300px;margin:0 auto 14px;font-size:12.5px;">Anda belum pernah mengajukan permintaan
+                    pemakaian barang. Mulai dengan mengajukan permintaan baru.</p>
+                  <a href="{{ route('karyawan.pemakaian.create') }}" class="btn-action btn-primary"
+                    style="padding:4px 10px;font-size:10.5px;gap:3px;border-radius:6px;">
+                    <i class="bi bi-plus" style="font-size:12px;"></i> Ajukan Sekarang
                   </a>
                 </div>
               </td>
@@ -98,15 +146,14 @@
           Menampilkan {{ $pemakaians->firstItem() }}–{{ $pemakaians->lastItem() }} dari {{ $pemakaians->total() }}
         </span>
         <div class="pagination">
-          @if(!$pemakaians->onFirstPage())
-            <a href="{{ $pemakaians->previousPageUrl() }}" class="pg-btn"><i class="bi bi-chevron-left"></i></a>
-          @endif
+          @if($pemakaians->onFirstPage())<span class="pg-btn" style="opacity:.4"><i class="bi bi-chevron-left"></i></span>
+          @else<a href="{{ $pemakaians->previousPageUrl() }}" class="pg-btn"><i class="bi bi-chevron-left"></i></a>@endif
           @foreach($pemakaians->getUrlRange(1, $pemakaians->lastPage()) as $page => $url)
             <a href="{{ $url }}" class="pg-btn {{ $page == $pemakaians->currentPage() ? 'active' : '' }}">{{ $page }}</a>
           @endforeach
-          @if($pemakaians->hasMorePages())
-            <a href="{{ $pemakaians->nextPageUrl() }}" class="pg-btn"><i class="bi bi-chevron-right"></i></a>
-          @endif
+          @if($pemakaians->hasMorePages())<a href="{{ $pemakaians->nextPageUrl() }}" class="pg-btn"><i
+            class="bi bi-chevron-right"></i></a>
+          @else<span class="pg-btn" style="opacity:.4"><i class="bi bi-chevron-right"></i></span>@endif
         </div>
       </div>
     @endif

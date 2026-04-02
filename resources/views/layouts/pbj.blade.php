@@ -9,12 +9,21 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="{{ asset('css/app.css') }}" rel="stylesheet"/>
   <link href="{{ asset('css/tambahan.css') }}" rel="stylesheet"/>
+  {{--
+    DIMODIFIKASI — layouts/pbj.blade.php
+    Perubahan:
+     1. Tambah menu: Notifikasi (+ badge) di sidebar dan topbar
+     2. Tambah badge styles konsisten dengan Level 1 & Level 2
+     3. Perbaikan CSS agar konsisten dengan tema admin layout
+  --}}
   <style>
     .badge-pending  { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; }
     .badge-approved { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
     .badge-rejected { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
     .badge-forwarded{ background:#DBEAFE; color:#1E40AF; border:1px solid #BFDBFE; }
     .badge-verified { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
+    .badge-verify   { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; animation: pulse-verify 2s ease-in-out infinite; }
+    @keyframes pulse-verify { 0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.3)} 50%{box-shadow:0 0 0 6px rgba(217,119,6,0)} }
     .status-badge {
       display:inline-flex; align-items:center; gap:5px;
       font-size:11px; font-weight:600; padding:4px 10px;
@@ -62,6 +71,9 @@
       text-decoration:none; transition:all .15s ease;
     }
     .filter-pill:hover, .filter-pill.active { background:#0055A5; color:#fff; border-color:#0055A5; }
+    .filter-pill.pending.active  { background:#D97706; border-color:#D97706; color:#fff; }
+    .filter-pill.approved.active { background:#059669; border-color:#059669; color:#fff; }
+    .filter-pill.rejected.active { background:#DC2626; border-color:#DC2626; color:#fff; }
   </style>
   @stack('styles')
 </head>
@@ -106,6 +118,15 @@
 
       <div class="menu-section">Akun</div>
 
+      <a href="{{ route('pbj.notifikasi') }}"
+         class="menu-item {{ request()->routeIs('pbj.notifikasi') ? 'active' : '' }}">
+        <i class="bi bi-bell"></i> Notifikasi
+        @php $badgeNotif = \App\Http\Controllers\Pbj\NotifikasiController::getBadgeCount(); @endphp
+        @if($badgeNotif > 0)
+          <span style="margin-left:auto;background:rgba(220,38,38,.85);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ $badgeNotif }}</span>
+        @endif
+      </a>
+
       <a href="{{ route('pbj.profil') }}"
          class="menu-item {{ request()->routeIs('pbj.profil') ? 'active' : '' }}">
         <i class="bi bi-person-circle"></i> Profil Saya
@@ -131,6 +152,14 @@
           <i class="bi bi-briefcase" style="margin-right:4px;color:#0055A5"></i>
           <strong style="color:#0055A5">Pejabat Pengadaan</strong>
         </div>
+        {{-- Bell notifikasi --}}
+        <a href="{{ route('pbj.notifikasi') }}" class="topbar-icon-btn" title="Notifikasi">
+          <i class="bi bi-bell"></i>
+          @php $badgeNotif = \App\Http\Controllers\Pbj\NotifikasiController::getBadgeCount(); @endphp
+          @if($badgeNotif > 0)
+            <span class="notif-badge">{{ $badgeNotif > 9 ? '9+' : $badgeNotif }}</span>
+          @endif
+        </a>
         {{-- Profil --}}
         <a href="{{ route('pbj.profil') }}" class="topbar-icon-btn" title="Profil Saya">
           <i class="bi bi-person-circle"></i>
