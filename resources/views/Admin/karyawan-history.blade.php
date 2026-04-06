@@ -119,13 +119,18 @@
               @foreach($p->details as $d)
                 <div style="font-size:12px;display:flex;align-items:center;gap:5px;">
                   <i class="bi bi-box-arrow-up" style="color:#0055A5;font-size:10px;"></i>
-                  {{ $d->barang->nama_barang ?? '-' }}
+                  @if($d->tipe_item === 'baru' && !$d->barang_id)
+                    {{ $d->nama_barang_baru }}
+                    <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:#FEF3C7;color:#92400E;">BARU</span>
+                  @else
+                    {{ $d->barang->nama_barang ?? '-' }}
+                  @endif
                 </div>
               @endforeach
             </td>
             <td>
               @foreach($p->details as $d)
-                <span style="background:#EFF6FF;color:#1D4ED8;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;">{{ $d->jumlah }} {{ $d->barang->satuan??'' }}</span>
+                <span style="background:#EFF6FF;color:#1D4ED8;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;">{{ $d->jumlah }} {{ ($d->tipe_item === 'baru' && !$d->barang_id) ? $d->satuan_baru : ($d->barang->satuan ?? '') }}</span>
               @endforeach
             </td>
             <td>

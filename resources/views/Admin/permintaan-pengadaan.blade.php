@@ -58,9 +58,13 @@
                <span style="background:rgba(255,255,255,.3);color:inherit;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:2px;">{{ $countVerif }}</span>
              @endif
           </a>
+          <a href="{{ route('admin.pengadaan.index', array_merge(request()->only('q'), ['status'=>'ditolak_pbj'])) }}"
+             class="filter-pill rejected {{ request('status')==='ditolak_pbj' ? 'active' : '' }}">
+             <i class="bi bi-x-circle" style="font-size:11px;"></i> Ditolak PBJ
+          </a>
           <a href="{{ route('admin.pengadaan.index', array_merge(request()->only('q'), ['status'=>'rejected'])) }}"
              class="filter-pill rejected {{ request('status')==='rejected' ? 'active' : '' }}">
-             <i class="bi bi-x-circle" style="font-size:11px;"></i> Ditolak
+             <i class="bi bi-x-circle" style="font-size:11px;"></i> Ditolak Admin
           </a>
         </div>
         <button type="submit" style="padding:8px 18px;background:#0055A5;color:#fff;border:none;
@@ -109,14 +113,19 @@
                 @foreach($pengadaan->details as $detail)
                   <div style="font-size:12px;color:#475569;display:flex;align-items:center;gap:6px;margin-bottom:2px;">
                     <i class="bi bi-box-arrow-up" style="color:#0055A5;font-size:10px;"></i>
-                    <span>{{ $detail->barang->nama_barang ?? '-' }}</span>
+                    @if($detail->tipe_item === 'baru' && !$detail->barang_id)
+                      <span>{{ $detail->nama_barang_baru }}</span>
+                      <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:#FEF3C7;color:#92400E;">BARU</span>
+                    @else
+                      <span>{{ $detail->barang->nama_barang ?? '-' }}</span>
+                    @endif
                   </div>
                 @endforeach
               </td>
               <td>
                 @foreach($pengadaan->details as $detail)
                   <span style="background:#EFF6FF;color:#1D4ED8;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;">
-                    {{ $detail->jumlah }} {{ $detail->barang->satuan ?? '' }}
+                    {{ $detail->jumlah }} {{ ($detail->tipe_item === 'baru' && !$detail->barang_id) ? $detail->satuan_baru : ($detail->barang->satuan ?? '') }}
                   </span>
                 @endforeach
               </td>
@@ -135,6 +144,8 @@
                     } else {
                       $gStatus = 'menunggu_verifikasi';
                     }
+                  } elseif ($pengadaan->status_level2 === 'approved' && $pengadaan->status_level3 === 'rejected') {
+                    $gStatus = 'ditolak_pbj';
                   } elseif ($pengadaan->status_level2 === 'approved') {
                     $gStatus = 'diproses_pbj';
                   } else {
@@ -147,7 +158,8 @@
                     'menunggu_verifikasi'  => ['Perlu Verifikasi', 'badge-verify', 'bi-shield-exclamation'],
                     'verified'             => ['Terverifikasi', 'badge-approved', 'bi-shield-fill-check'],
                     'verifikasi_ditolak'   => ['Verifikasi Ditolak', 'badge-rejected', 'bi-shield-x'],
-                    'rejected'             => ['Ditolak', 'badge-rejected', 'bi-x-circle'],
+                    'ditolak_pbj'          => ['Ditolak PBJ', 'badge-rejected', 'bi-x-circle'],
+                    'rejected'             => ['Ditolak Admin', 'badge-rejected', 'bi-x-circle'],
                   ];
                   [$lbl, $cls, $ico] = $sMap[$gStatus] ?? ['-', '', ''];
                 @endphp

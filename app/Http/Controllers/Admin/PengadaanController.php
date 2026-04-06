@@ -48,6 +48,10 @@ class PengadaanController extends Controller
                 case 'approved':
                     $query->where('status_level2', 'approved');
                     break;
+                case 'ditolak_pbj':
+                    $query->where('status_level2', 'approved')
+                          ->where('status_level3', 'rejected');
+                    break;
                 case 'rejected':
                     $query->where('status_level2', 'rejected');
                     break;
