@@ -238,7 +238,7 @@
                 title: 'Teruskan ke PBJ?',
                 message: 'Permintaan pengadaan akan disetujui dan diteruskan ke PBJ untuk ditindaklanjuti.',
                 icon: 'bi-send-fill', iconColor: '#059669',
-                confirmText: 'Ya, Teruskan ke PBJ', confirmClass: 'confirm-btn-success',
+                confirmText: 'Teruskan ke PBJ', confirmClass: 'confirm-btn-success',
                 onConfirm: function() { document.getElementById('form-approve-pgd-detail').submit(); }
               })"
               style="width:100%;padding:12px;border-radius:10px;border:none;background:#059669;
@@ -305,7 +305,7 @@
                 title: 'Tolak Verifikasi?',
                 message: 'Data pengadaan dari PBJ akan ditolak dan stok tidak akan ditambahkan.',
                 icon: 'bi-x-circle-fill', iconColor: '#DC2626',
-                confirmText: 'Ya, Tolak Verifikasi', confirmClass: 'confirm-btn-danger',
+                confirmText: 'Tolak Verifikasi', confirmClass: 'confirm-btn-danger',
                 onConfirm: function() { document.getElementById('form-reject-verification').submit(); }
               })"
               style="width:100%;padding:12px;border-radius:10px;border:none;background:#FEF2F2;

@@ -129,8 +129,10 @@
                         <input type="number"
                                name="jumlah_realisasi[{{ $detail->id }}]"
                                min="0"
-                               max="{{ $detail->jumlah }}"
+                               max="999"
                                value="{{ old("jumlah_realisasi.{$detail->id}", $detail->jumlah) }}"
+                               onkeydown="return /[0-9]/.test(event.key) || ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.key)"
+                               oninput="if(this.value > 999) this.value = 999; if(this.value < 0) this.value = 0;"
                                style="width:80px;padding:6px 8px;border:1.5px solid #CBD5E1;border-radius:6px;font-size:13px;text-align:center;"
                                required>
                         @error("jumlah_realisasi.{$detail->id}")
