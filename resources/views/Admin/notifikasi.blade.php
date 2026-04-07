@@ -79,6 +79,7 @@
             case 'menunggu_verifikasi':   $icon='bi-shield-exclamation';$iconColor='#D97706';$iconBg='rgba(217,119,6,.12)';$title='PBJ Selesai — Menunggu Verifikasi Anda';$badgeClass='badge-verify';$badgeLabel='Perlu Verifikasi';break;
             case 'verified':             $icon='bi-shield-fill-check';$iconColor='#059669';$iconBg='rgba(5,150,105,.1)';$title='Pengadaan Terverifikasi';$badgeClass='badge-approved';$badgeLabel='Terverifikasi';break;
             case 'verifikasi_ditolak':    $icon='bi-shield-x';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Verifikasi Pengadaan Ditolak';$badgeClass='badge-rejected';$badgeLabel='Verifikasi Ditolak';break;
+            case 'ditolak_pbj':          $icon='bi-x-circle-fill';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Pengadaan Ditolak oleh PBJ';$badgeClass='badge-rejected';$badgeLabel='Ditolak PBJ';break;
             case 'rejected':             $icon='bi-bag-x-fill';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Permintaan Pengadaan Ditolak';$badgeClass='badge-rejected';$badgeLabel='Ditolak';break;
             default:                     $icon='bi-bag-plus-fill';$iconColor='var(--bps-orange)';$iconBg='rgba(240,125,0,.1)';$title='Permintaan Pengadaan';$badgeClass='badge-pending';$badgeLabel='Menunggu';
           }

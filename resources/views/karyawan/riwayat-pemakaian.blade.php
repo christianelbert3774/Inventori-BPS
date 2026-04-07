@@ -137,10 +137,6 @@
                   <h4 style="font-size:14px;">Belum Ada Permintaan</h4>
                   <p style="max-width:300px;margin:0 auto 14px;font-size:12.5px;">Anda belum pernah mengajukan permintaan
                     pemakaian barang. Mulai dengan mengajukan permintaan baru.</p>
-                  <a href="{{ route('karyawan.pemakaian.create') }}" class="btn-action btn-primary"
-                    style="padding:4px 10px;font-size:10.5px;gap:3px;border-radius:6px;">
-                    <i class="bi bi-plus" style="font-size:12px;"></i> Ajukan Sekarang
-                  </a>
                 </div>
               </td>
             </tr>

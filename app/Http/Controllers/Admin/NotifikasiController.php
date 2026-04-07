@@ -59,6 +59,8 @@ class NotifikasiController extends Controller
                 } else {
                     $granularStatus = 'menunggu_verifikasi';
                 }
+            } elseif ($p->status_level2 === 'approved' && $p->status_level3 === 'rejected') {
+                $granularStatus = 'ditolak_pbj';
             } elseif ($p->status_level2 === 'approved') {
                 $granularStatus = 'diproses_pbj';
             } else {
