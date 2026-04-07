@@ -119,7 +119,6 @@ class KaryawanController extends Controller
 
         User::create([
             'role'     => 'karyawan',
-            'role_id'  => 1,
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
