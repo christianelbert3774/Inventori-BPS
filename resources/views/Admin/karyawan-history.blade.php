@@ -8,18 +8,24 @@
   Halaman riwayat permintaan per karyawan.
   Filter: jenis (pemakaian/pengadaan) + status.
 --}}
-<div class="page-header">
-  <div class="breadcrumb">
-    <a href="{{ route('admin.dashboard') }}" style="color:inherit;text-decoration:none;">Dashboard</a>
-    <span class="sep">/</span>
-    <a href="{{ route('admin.karyawan.index') }}" style="color:inherit;text-decoration:none;">Karyawan</a>
-    <span class="sep">/</span><span class="current">Riwayat {{ $karyawan->name }}</span>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+  <div>
+    <div class="breadcrumb">
+      <a href="{{ route('admin.dashboard') }}" style="color:inherit;text-decoration:none;">Dashboard</a>
+      <span class="sep">/</span>
+      <a href="{{ route('admin.karyawan.index') }}" style="color:inherit;text-decoration:none;">Karyawan</a>
+      <span class="sep">/</span><span class="current">Riwayat {{ $karyawan->name }}</span>
+    </div>
+    <h2>Riwayat: {{ $karyawan->name }}</h2>
+    <p>
+      {{ $karyawan->bagian ?? '-' }} · {{ $karyawan->jabatan ?? '-' }}
+      @if($karyawan->nip) · NIP {{ $karyawan->nip }} @endif
+    </p>
   </div>
-  <h2>Riwayat: {{ $karyawan->name }}</h2>
-  <p>
-    {{ $karyawan->bagian ?? '-' }} · {{ $karyawan->jabatan ?? '-' }}
-    @if($karyawan->nip) · NIP {{ $karyawan->nip }} @endif
-  </p>
+  <a href="{{ route('admin.karyawan.print', $karyawan->id) }}" target="_blank"
+     class="btn-detail" style="padding:9px 18px;font-size:13px;font-weight:700;gap:7px;border-radius:9px;white-space:nowrap;">
+    <i class="bi bi-printer-fill"></i> Print Laporan
+  </a>
 </div>
 
 {{-- FILTER --}}

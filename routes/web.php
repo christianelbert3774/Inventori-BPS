@@ -71,6 +71,10 @@ Route::middleware(['auth'])
         Route::patch('/profil/password', [ProfilController::class , 'updatePassword'])->name('profil.password');
         Route::get('/profil/print', [ProfilController::class , 'printAktivitas'])->name('profil.print');
 
+        // Print single aktivitas
+        Route::get('/pemakaian/{pemakaian}/print', [ProfilController::class , 'printPemakaian'])->name('pemakaian.print');
+        Route::get('/pengadaan/{pengadaan}/print', [ProfilController::class , 'printPengadaan'])->name('pengadaan.print');
+
         // Notifikasi
         Route::get('/notifikasi', [NotifikasiController::class , 'index'])->name('notifikasi');
     });
@@ -106,6 +110,7 @@ Route::middleware(['auth', 'role:divisi_umum'])
         Route::post('/karyawan', [AdminKaryawanController::class , 'store'])->name('karyawan.store');
         Route::get('/karyawan/{karyawan}/history', [AdminKaryawanController::class , 'history'])->name('karyawan.history');
         Route::patch('/karyawan/{karyawan}/toggle-active', [AdminKaryawanController::class , 'toggleActive'])->name('karyawan.toggleActive');
+        Route::get('/karyawan/{karyawan}/print', [AdminKaryawanController::class , 'printAktivitas'])->name('karyawan.print');
 
         // Notifikasi
         Route::get('/notifikasi', [AdminNotifikasiController::class , 'index'])->name('notifikasi');

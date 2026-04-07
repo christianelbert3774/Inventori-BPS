@@ -82,6 +82,7 @@
             <th>Barang</th>
             <th>Status</th>
             <th>Diproses Oleh</th>
+            <th style="width:70px">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -116,10 +117,18 @@
                   <div style="font-size:11px">{{ \Carbon\Carbon::parse($p->approved_at)->format('d M Y') }}</div>
                 @endif
               </td>
+              <td>
+                <a href="{{ route('karyawan.pemakaian.print', $p->id) }}" target="_blank"
+                   style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;text-decoration:none;transition:all .15s ease;"
+                   onmouseover="this.style.background='#BFDBFE'" onmouseout="this.style.background='#EFF6FF'"
+                   title="Print permintaan ini">
+                  🖨️
+                </a>
+              </td>
             </tr>
           @empty
             <tr>
-              <td colspan="5">
+              <td colspan="6">
                 <div class="empty-state" style="padding:40px 24px;">
                   <div
                     style="width:64px;height:64px;border-radius:50%;background:rgba(0,85,165,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
