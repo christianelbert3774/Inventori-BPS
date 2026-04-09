@@ -18,21 +18,38 @@
     <p>Permintaan pengadaan yang sudah disetujui Divisi Umum dan perlu ditindaklanjuti PBJ.</p>
   </div>
 
-  {{-- Filter Status --}}
-  <div class="filter-bar" style="margin-bottom:16px;">
-    @foreach(['' => 'Semua', 'pending' => 'Menunggu', 'completed' => 'Selesai', 'rejected' => 'Ditolak'] as $val => $lbl)
-      <a href="{{ route('pbj.pengadaan.index', ['status' => $val]) }}"
-         class="filter-pill {{ request('status') === $val ? 'active' : '' }} {{ $val === 'pending' ? 'pending' : ($val === 'completed' ? 'approved' : ($val === 'rejected' ? 'rejected' : '')) }}">
-        {{ $lbl }}
-      </a>
-    @endforeach
+  {{-- FILTER & SEARCH --}}
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header" style="padding:16px 20px;">
+      <form method="GET" action="{{ route('pbj.pengadaan.index') }}" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;width:100%;">
+        <div style="flex:1;min-width:200px;position:relative;">
+          <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94A3B8;"></i>
+          <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama pemohon..."
+                 style="width:100%;padding:8px 12px 8px 36px;border:1.5px solid #E2E8F0;border-radius:8px;
+                        font-size:13px;font-family:inherit;outline:none;"
+                 onfocus="this.style.borderColor='#0055A5'" onblur="this.style.borderColor='#E2E8F0'"/>
+        </div>
+        <div class="filter-bar">
+          @foreach(['' => 'Semua', 'pending' => 'Menunggu', 'completed' => 'Selesai', 'rejected' => 'Ditolak'] as $val => $lbl)
+            <a href="{{ route('pbj.pengadaan.index', array_merge(request()->only('q'), ['status' => $val])) }}"
+               class="filter-pill {{ request('status') === $val ? 'active' : '' }} {{ $val === 'pending' ? 'pending' : ($val === 'completed' ? 'approved' : ($val === 'rejected' ? 'rejected' : '')) }}">
+              {{ $lbl }}
+            </a>
+          @endforeach
+        </div>
+        <button type="submit" style="padding:8px 18px;background:#0055A5;color:#fff;border:none;
+                border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+          <i class="bi bi-search"></i> Cari
+        </button>
+      </form>
+    </div>
   </div>
 
   <div class="card">
     <div class="card-header">
       <div>
         <h3>Permintaan Pengadaan</h3>
-        <div class="card-sub">{{ $pengadaans->total() }} total pengadaan</div>
+        <div class="card-sub">{{ $pengadaans->total() }} total pengadaan{{ request('q') ? ' untuk "'.request('q').'"' : '' }}</div>
       </div>
     </div>
     <div class="table-wrap">

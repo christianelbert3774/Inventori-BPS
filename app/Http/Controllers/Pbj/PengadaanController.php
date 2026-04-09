@@ -35,6 +35,13 @@ class PengadaanController extends Controller
             ->where('status_level2', 'approved')
             ->latest();
 
+        // Pencarian berdasarkan nama pemohon
+        if ($request->filled('q')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->q . '%');
+            });
+        }
+
         if ($request->filled('status')) {
             $query->where('status_level3', $request->status);
         }
