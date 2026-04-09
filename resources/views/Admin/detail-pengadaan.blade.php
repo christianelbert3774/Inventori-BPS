@@ -50,7 +50,7 @@
             </div>
           </div>
           <div>
-            <div class="detail-label">Status Level 2 (Divisi Umum)</div>
+            <div class="detail-label">Status Divisi Umum</div>
             <div class="detail-value">
               @php
                 $sMap = [
@@ -64,7 +64,7 @@
             </div>
           </div>
           <div>
-            <div class="detail-label">Status Level 3 (PBJ)</div>
+            <div class="detail-label">Status PBJ</div>
             <div class="detail-value">
               @php
                 $s3Map = [

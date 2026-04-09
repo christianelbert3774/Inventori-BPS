@@ -47,17 +47,17 @@
         </div>
         <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div>
-            <div class="detail-label">Nama</div>
+            <div class="detail-label">Nama Lengkap</div>
             <div class="detail-value">{{ $pengadaan->user->name ?? '-' }}</div>
-          </div>
-          <div>
-            <div class="detail-label">Divisi</div>
-            <div class="detail-value">{{ $pengadaan->user->bagian ?? '-' }}</div>
           </div>
           <div>
             <div class="detail-label">Tanggal Pengajuan</div>
             <div class="detail-value">{{ $pengadaan->created_at->format('d/m/Y H:i') }}</div>
           </div>
+          <div>
+            <div class="detail-label">Bagian / Divisi</div>
+            <div class="detail-value">{{ $pengadaan->user->bagian ?? '-' }}</div>
+          </div>        
           <div>
             <div class="detail-label">Status PBJ</div>
             <div class="detail-value">
