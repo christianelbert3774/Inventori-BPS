@@ -27,8 +27,6 @@
       </div>
       <div class="profil-meta">
         @if($user->nip)<span><i class="bi bi-credit-card"></i> NIP {{ $user->nip }}</span>@endif
-        @if($user->bagian)<span><i class="bi bi-building"></i> {{ $user->bagian }}</span>@endif
-        @if($user->jabatan)<span><i class="bi bi-briefcase"></i> {{ $user->jabatan }}</span>@endif
       </div>
     </div>
   </div>
@@ -91,14 +89,7 @@
             <label>No. Telepon</label>
             <input class="form-control" type="text" name="no_telp" value="{{ old('no_telp',$user->no_telp) }}" placeholder="Contoh: 08123456789"/>
           </div>
-          <div class="form-group">
-            <label>Bagian / Unit Kerja</label>
-            <input class="form-control" type="text" name="bagian" value="{{ old('bagian',$user->bagian) }}" placeholder="Bagian Anda"/>
-          </div>
-          <div class="form-group">
-            <label>Jabatan</label>
-            <input class="form-control" type="text" name="jabatan" value="{{ old('jabatan',$user->jabatan) }}" placeholder="Jabatan Anda"/>
-          </div>
+
         </div>
         <div class="info-banner blue" style="margin-top:10px">
           <i class="bi bi-info-circle-fill"></i>
