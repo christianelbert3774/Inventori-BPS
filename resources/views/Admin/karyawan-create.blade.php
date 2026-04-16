@@ -13,8 +13,6 @@
   <h2>Tambah Akun Karyawan</h2>
   <p>Buat akun karyawan baru. Karyawan dapat langsung login setelah akun dibuat.</p>
 </div>
-
-{{-- CONTAINER DIPERLEBAR AGAR TIDAK ADA SPACE KOSONG --}}
 <div style="max-width:1500px;width:100%;">
   <div class="form-card">
 
@@ -90,7 +88,7 @@
           </div>
 
           <div class="form-group">
-            <label>Bagian / Unit Kerja</label>
+            <label>Bagian / Divisi</label>
             <input class="form-control"
                    type="text"
                    name="bagian"

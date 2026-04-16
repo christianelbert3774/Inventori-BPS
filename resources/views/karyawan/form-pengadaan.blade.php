@@ -164,15 +164,6 @@
                 @endforeach
               </select>
             </div>
-            <div class="form-group">
-              <label>Kategori <span class="req">*</span></label>
-              <select class="form-control" name="kategori_baru" data-required>
-                <option value="">-- Pilih Kategori --</option>
-                @foreach(['ATK (Alat Tulis Kantor)','Elektronik & Komputer','Kebersihan & Sanitasi','Peralatan Kantor','Perlengkapan Lapangan','Lain-lain'] as $k)
-                  <option value="{{ $k }}" {{ old('kategori_baru') === $k ? 'selected' : '' }}>{{ $k }}</option>
-                @endforeach
-              </select>
-            </div>
             <div class="form-group" style="grid-column:1/-1">
               <label>Alasan Pengadaan <span class="req">*</span></label>
               <textarea class="form-control" name="alasan_baru" data-required

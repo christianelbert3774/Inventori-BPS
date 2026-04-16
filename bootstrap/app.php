@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+        $middleware->statefulApi();
 
         // Redirect jika belum login
         $middleware->redirectGuestsTo(fn () => route('login'));

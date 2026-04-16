@@ -42,7 +42,7 @@ class PengadaanController extends Controller
      * BUGFIX: Sebelumnya untuk mode 'baru', Barang::create() langsung dipanggil
      * di sini sehingga barang muncul di tabel barang sebelum diapprove.
      * Sekarang data barang baru disimpan sementara di kolom pengadaan_detail
-     * (nama_barang_baru, satuan_baru, kategori_baru) dan barang_id dibiarkan NULL.
+     * (nama_barang_baru, satuan_baru) dan barang_id dibiarkan NULL.
      * Record Barang baru dibuat oleh PBJ saat mereka menyelesaikan pengadaan.
      */
     public function store(Request $request)
@@ -88,13 +88,11 @@ class PengadaanController extends Controller
                 'nama_barang_baru' => ['required', 'string', 'max:100'],
                 'jumlah_baru'      => ['required', 'integer', 'min:1'],
                 'satuan_baru'      => ['required', 'string', 'max:30'],
-                'kategori_baru'    => ['required', 'string', 'max:100'],
                 'alasan_baru'      => ['required', 'string', 'max:1000'],
             ], [
                 'nama_barang_baru.required' => 'Nama barang wajib diisi.',
                 'jumlah_baru.required'      => 'Jumlah wajib diisi.',
                 'satuan_baru.required'      => 'Satuan wajib dipilih.',
-                'kategori_baru.required'    => 'Kategori wajib dipilih.',
                 'alasan_baru.required'      => 'Alasan pengadaan wajib diisi.',
             ]);
 
@@ -114,7 +112,6 @@ class PengadaanController extends Controller
                     'barang_id'       => null, // belum ada, akan dibuat saat PBJ selesai
                     'nama_barang_baru'=> $request->nama_barang_baru,
                     'satuan_baru'     => $request->satuan_baru,
-                    'kategori_baru'   => $request->kategori_baru,
                     'jumlah'          => (int) $request->jumlah_baru,
                     'alasan'          => $request->alasan_baru,
                 ]);
