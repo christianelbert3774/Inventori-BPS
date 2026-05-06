@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\NotifikasiController;
 use App\Http\Controllers\Api\V1\PemakaianController;
 use App\Http\Controllers\Api\V1\PengadaanController;
+use App\Http\Controllers\Api\V1\PrintController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,4 +56,13 @@ Route::prefix('v1')
         // Notifikasi
         Route::get('/notifikasi', [NotifikasiController::class, 'index']);
         Route::get('/notifikasi/badge', [NotifikasiController::class, 'badgeCount']);
+
     });
+
+// ── PRINT (autentikasi ditangani oleh PrintController via ?token=) ──
+// Harus di luar auth:sanctum karena WebView tidak mengirim header Authorization
+Route::prefix('v1')->group(function () {
+    Route::get('/print/pemakaian/{pemakaian}', [PrintController::class, 'pemakaian']);
+    Route::get('/print/pengadaan/{pengadaan}', [PrintController::class, 'pengadaan']);
+    Route::get('/print/aktivitas', [PrintController::class, 'aktivitas']);
+});
