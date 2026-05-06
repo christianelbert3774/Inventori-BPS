@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 /**
  * BARU — Admin\KaryawanController.php
@@ -119,7 +120,6 @@ class KaryawanController extends Controller
 
         User::create([
             'role'     => 'karyawan',
-            'role_id'  => 1,
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
@@ -142,5 +142,44 @@ class KaryawanController extends Controller
         $karyawan->update(['is_active' => !$karyawan->is_active]);
         $status = $karyawan->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return back()->with('success', "Akun {$karyawan->name} berhasil {$status}.");
+    }
+
+    /**
+     * Halaman print aktivitas karyawan (untuk admin).
+     * Mendukung filter bulan dan jenis (pengadaan/pemakaian/semua).
+     */
+    public function printAktivitas(Request $request, User $karyawan)
+    {
+        $bulan = $request->input('bulan', now()->format('Y-m'));
+        $jenis = $request->input('jenis', 'semua');
+
+        // Parse bulan
+        $start = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth();
+        $end   = $start->copy()->endOfMonth();
+
+        $pemakaians = collect();
+        $pengadaans = collect();
+
+        if ($jenis === 'semua' || $jenis === 'pemakaian') {
+            $pemakaians = Pemakaian::with(['details.barang', 'approvedBy'])
+                ->where('user_id', $karyawan->id)
+                ->whereBetween('created_at', [$start, $end])
+                ->latest()
+                ->get();
+        }
+
+        if ($jenis === 'semua' || $jenis === 'pengadaan') {
+            $pengadaans = Pengadaan::with(['details.barang'])
+                ->where('user_id', $karyawan->id)
+                ->whereBetween('created_at', [$start, $end])
+                ->latest()
+                ->get();
+        }
+
+        $bulanLabel = $start->locale('id')->isoFormat('MMMM Y');
+
+        return view('admin.print-karyawan-aktivitas', compact(
+            'karyawan', 'pemakaians', 'pengadaans', 'bulanLabel', 'bulan', 'jenis'
+        ));
     }
 }

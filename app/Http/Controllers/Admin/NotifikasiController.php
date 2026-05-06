@@ -46,12 +46,33 @@ class NotifikasiController extends Controller
         }
 
         foreach ($pengadaans as $p) {
+            // Determine granular status for admin clarity
+            if ($p->status_level2 === 'rejected') {
+                $granularStatus = 'rejected';
+            } elseif ($p->status_level2 === 'pending') {
+                $granularStatus = 'pending';
+            } elseif ($p->status_level2 === 'approved' && $p->status_level3 === 'completed') {
+                if ($p->status_admin_verifikasi === 'verified') {
+                    $granularStatus = 'verified';
+                } elseif ($p->status_admin_verifikasi === 'rejected') {
+                    $granularStatus = 'verifikasi_ditolak';
+                } else {
+                    $granularStatus = 'menunggu_verifikasi';
+                }
+            } elseif ($p->status_level2 === 'approved' && $p->status_level3 === 'rejected') {
+                $granularStatus = 'ditolak_pbj';
+            } elseif ($p->status_level2 === 'approved') {
+                $granularStatus = 'diproses_pbj';
+            } else {
+                $granularStatus = $p->status_level2;
+            }
+
             $notifikasis->push([
                 'type'    => 'pengadaan',
                 'id'      => $p->id,
-                'status'  => $p->status_level2,
+                'status'  => $granularStatus,
                 'pemohon' => $p->user->name ?? '—',
-                'barangs' => $p->details->map(fn($d) => ($d->barang->nama_barang ?? '-') . ' ×' . $d->jumlah)->join(', '),
+                'barangs' => $p->details->map(fn($d) => ($d->barang->nama_barang ?? $d->nama_barang_baru ?? '-') . ' ×' . $d->jumlah)->join(', '),
                 'time'    => $p->updated_at,
             ]);
         }

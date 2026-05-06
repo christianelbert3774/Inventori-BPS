@@ -8,18 +8,24 @@
   Halaman riwayat permintaan per karyawan.
   Filter: jenis (pemakaian/pengadaan) + status.
 --}}
-<div class="page-header">
-  <div class="breadcrumb">
-    <a href="{{ route('admin.dashboard') }}" style="color:inherit;text-decoration:none;">Dashboard</a>
-    <span class="sep">/</span>
-    <a href="{{ route('admin.karyawan.index') }}" style="color:inherit;text-decoration:none;">Karyawan</a>
-    <span class="sep">/</span><span class="current">Riwayat {{ $karyawan->name }}</span>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+  <div>
+    <div class="breadcrumb">
+      <a href="{{ route('admin.dashboard') }}" style="color:inherit;text-decoration:none;">Dashboard</a>
+      <span class="sep">/</span>
+      <a href="{{ route('admin.karyawan.index') }}" style="color:inherit;text-decoration:none;">Karyawan</a>
+      <span class="sep">/</span><span class="current">Riwayat {{ $karyawan->name }}</span>
+    </div>
+    <h2>Riwayat: {{ $karyawan->name }}</h2>
+    <p>
+      {{ $karyawan->bagian ?? '-' }} · {{ $karyawan->jabatan ?? '-' }}
+      @if($karyawan->nip) · NIP {{ $karyawan->nip }} @endif
+    </p>
   </div>
-  <h2>Riwayat: {{ $karyawan->name }}</h2>
-  <p>
-    {{ $karyawan->bagian ?? '-' }} · {{ $karyawan->jabatan ?? '-' }}
-    @if($karyawan->nip) · NIP {{ $karyawan->nip }} @endif
-  </p>
+  <a href="{{ route('admin.karyawan.print', $karyawan->id) }}" target="_blank"
+     class="btn-detail" style="padding:9px 18px;font-size:13px;font-weight:700;gap:7px;border-radius:9px;white-space:nowrap;">
+    <i class="bi bi-printer-fill"></i> Print Laporan
+  </a>
 </div>
 
 {{-- FILTER --}}
@@ -105,7 +111,7 @@
   <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>#</th><th>Tanggal</th><th>Barang</th><th>Jumlah</th><th>Status L2</th><th>Aksi</th></tr>
+        <tr><th>#</th><th>Tanggal</th><th>Barang</th><th>Jumlah</th><th>Status</th><th>Aksi</th></tr>
       </thead>
       <tbody>
         @forelse($pengadaans as $idx => $p)
@@ -119,18 +125,42 @@
               @foreach($p->details as $d)
                 <div style="font-size:12px;display:flex;align-items:center;gap:5px;">
                   <i class="bi bi-box-arrow-up" style="color:#0055A5;font-size:10px;"></i>
-                  {{ $d->barang->nama_barang ?? '-' }}
+                  @if($d->tipe_item === 'baru' && !$d->barang_id)
+                    {{ $d->nama_barang_baru }}
+                    <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:#FEF3C7;color:#92400E;">BARU</span>
+                  @else
+                    {{ $d->barang->nama_barang ?? '-' }}
+                  @endif
                 </div>
               @endforeach
             </td>
             <td>
               @foreach($p->details as $d)
-                <span style="background:#EFF6FF;color:#1D4ED8;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;">{{ $d->jumlah }} {{ $d->barang->satuan??'' }}</span>
+                <span style="background:#EFF6FF;color:#1D4ED8;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;">{{ $d->jumlah }} {{ ($d->tipe_item === 'baru' && !$d->barang_id) ? $d->satuan_baru : ($d->barang->satuan ?? '') }}</span>
               @endforeach
             </td>
             <td>
-              @php $sm=['pending'=>['Menunggu','badge-pending'],'approved'=>['Diteruskan','badge-forwarded'],'rejected'=>['Ditolak','badge-rejected']];[$l,$c]=$sm[$p->status_level2]??['-',''];@endphp
-              <span class="status-badge {{ $c }}">{{ $l }}</span>
+              @if($p->status_level2 === 'pending')
+                <span class="status-badge badge-pending">Menunggu</span>
+              @elseif($p->status_level2 === 'rejected')
+                <span class="status-badge badge-rejected">Ditolak</span>
+              @elseif($p->status_level2 === 'approved')
+                @if($p->status_level3 === 'completed')
+                  @if($p->status_admin_verifikasi === 'verified')
+                    <span class="status-badge badge-approved">Terverifikasi</span>
+                  @elseif($p->status_admin_verifikasi === 'rejected')
+                    <span class="status-badge badge-rejected">Verifikasi Ditolak</span>
+                  @else
+                    <span class="status-badge badge-forwarded">Menunggu Verifikasi</span>
+                  @endif
+                @elseif($p->status_level3 === 'rejected')
+                  <span class="status-badge badge-rejected">Ditolak PBJ</span>
+                @elseif($p->status_level3 === 'processing')
+                  <span class="status-badge badge-forwarded">Diproses PBJ</span>
+                @else
+                  <span class="status-badge badge-forwarded">Diteruskan ke PBJ</span>
+                @endif
+              @endif
             </td>
             <td><a href="{{ route('admin.pengadaan.show', $p->id) }}" class="btn-detail"><i class="bi bi-eye"></i> Detail</a></td>
           </tr>

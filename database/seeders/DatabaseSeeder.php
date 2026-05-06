@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Barang;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,16 +11,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── ROLES (sudah ada di SQL, tapi aman di-seed ulang) ──
-        $roleKaryawan   = Role::firstOrCreate(['name' => 'karyawan']);
-        $roleDivisi     = Role::firstOrCreate(['name' => 'divisi_umum']);
-        $rolePbj        = Role::firstOrCreate(['name' => 'pbj']);
-
         // ── USERS ──
         User::firstOrCreate(
             ['email' => 'karyawan@bps.go.id'],
             [
-                'role_id'  => $roleKaryawan->id,
+                'role'     => 'karyawan',
                 'name'     => 'Rizky Saputra',
                 'password' => Hash::make('password'),
             ]
@@ -30,7 +24,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@bps.go.id'],
             [
-                'role_id'  => $roleDivisi->id,
+                'role'     => 'divisi_umum',
                 'name'     => 'Siti Aminah',
                 'password' => Hash::make('password'),
             ]
@@ -39,7 +33,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'pbj@bps.go.id'],
             [
-                'role_id'  => $rolePbj->id,
+                'role'     => 'pejabat_pengadaan',
                 'name'     => 'Budi Santoso',
                 'password' => Hash::make('password'),
             ]

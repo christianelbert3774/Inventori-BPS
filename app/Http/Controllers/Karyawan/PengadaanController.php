@@ -38,6 +38,12 @@ class PengadaanController extends Controller
 
     /**
      * Simpan permintaan pengadaan baru.
+     *
+     * BUGFIX: Sebelumnya untuk mode 'baru', Barang::create() langsung dipanggil
+     * di sini sehingga barang muncul di tabel barang sebelum diapprove.
+     * Sekarang data barang baru disimpan sementara di kolom pengadaan_detail
+     * (nama_barang_baru, satuan_baru) dan barang_id dibiarkan NULL.
+     * Record Barang baru dibuat oleh PBJ saat mereka menyelesaikan pengadaan.
      */
     public function store(Request $request)
     {
@@ -66,8 +72,10 @@ class PengadaanController extends Controller
 
                 PengadaanDetail::create([
                     'pengadaan_id' => $pengadaan->id,
+                    'tipe_item'    => 'restock',
                     'barang_id'    => $request->barang_id,
                     'jumlah'       => (int) $request->jumlah_restock,
+                    'alasan'       => $request->alasan_restock,
                 ]);
             });
 
@@ -80,35 +88,32 @@ class PengadaanController extends Controller
                 'nama_barang_baru' => ['required', 'string', 'max:100'],
                 'jumlah_baru'      => ['required', 'integer', 'min:1'],
                 'satuan_baru'      => ['required', 'string', 'max:30'],
-                'kategori_baru'    => ['required', 'string', 'max:100'],
                 'alasan_baru'      => ['required', 'string', 'max:1000'],
             ], [
                 'nama_barang_baru.required' => 'Nama barang wajib diisi.',
                 'jumlah_baru.required'      => 'Jumlah wajib diisi.',
                 'satuan_baru.required'      => 'Satuan wajib dipilih.',
-                'kategori_baru.required'    => 'Kategori wajib dipilih.',
                 'alasan_baru.required'      => 'Alasan pengadaan wajib diisi.',
             ]);
 
             DB::transaction(function () use ($request) {
-                // Buat barang baru dengan stok 0 (akan diupdate setelah PBJ selesai belanja)
-                $barang = Barang::create([
-                    'kode_barang' => Barang::generateKode(),
-                    'nama_barang' => $request->nama_barang_baru,
-                    'satuan'      => $request->satuan_baru,
-                    'stok'        => 0,
-                ]);
-
                 $pengadaan = Pengadaan::create([
                     'user_id'       => Auth::id(),
                     'status_level2' => 'pending',
                     'status_level3' => 'pending',
                 ]);
 
+                // BUGFIX: Tidak lagi membuat Barang di sini.
+                // Data barang baru disimpan sebagai kolom sementara di pengadaan_detail.
+                // barang_id sengaja NULL — akan diisi oleh PBJ saat menyelesaikan pengadaan.
                 PengadaanDetail::create([
-                    'pengadaan_id' => $pengadaan->id,
-                    'barang_id'    => $barang->id,
-                    'jumlah'       => (int) $request->jumlah_baru,
+                    'pengadaan_id'    => $pengadaan->id,
+                    'tipe_item'       => 'baru',
+                    'barang_id'       => null, // belum ada, akan dibuat saat PBJ selesai
+                    'nama_barang_baru'=> $request->nama_barang_baru,
+                    'satuan_baru'     => $request->satuan_baru,
+                    'jumlah'          => (int) $request->jumlah_baru,
+                    'alasan'          => $request->alasan_baru,
                 ]);
             });
 

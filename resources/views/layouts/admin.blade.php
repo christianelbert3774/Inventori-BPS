@@ -22,6 +22,8 @@
     .badge-approved { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
     .badge-rejected { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
     .badge-forwarded{ background:#DBEAFE; color:#1E40AF; border:1px solid #BFDBFE; }
+    .badge-verify   { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; animation: pulse-verify 2s ease-in-out infinite; }
+    @keyframes pulse-verify { 0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.3)} 50%{box-shadow:0 0 0 6px rgba(217,119,6,0)} }
     .status-badge {
       display:inline-flex; align-items:center; gap:5px;
       font-size:11px; font-weight:600; padding:4px 10px;
@@ -117,9 +119,13 @@
       <a href="{{ route('admin.pengadaan.index') }}"
          class="menu-item {{ request()->routeIs('admin.pengadaan.*') ? 'active' : '' }}">
         <i class="bi bi-bag-check"></i> Permintaan Pengadaan
-        @php $badgePengadaan = \App\Models\Pengadaan::where('status_level2','pending')->count(); @endphp
-        @if($badgePengadaan > 0)
-          <span style="margin-left:auto;background:rgba(245,158,11,.9);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ $badgePengadaan }}</span>
+        @php
+          $badgePengadaan = \App\Models\Pengadaan::where('status_level2','pending')->count();
+          $badgeVerifikasi = \App\Models\Pengadaan::where('status_level3','completed')->where('status_admin_verifikasi','belum')->count();
+          $totalBadgePgd = $badgePengadaan + $badgeVerifikasi;
+        @endphp
+        @if($totalBadgePgd > 0)
+          <span style="margin-left:auto;background:rgba(245,158,11,.9);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ $totalBadgePgd }}</span>
         @endif
       </a>
 

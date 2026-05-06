@@ -18,7 +18,7 @@
   {{-- STAT ROW 1: Inventori --}}
   <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.8px;">Inventori Barang</div>
   <div class="stat-grid" style="margin-bottom:24px;">
-    <div class="stat-card">
+    <div class="stat-card"> 
       <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
       <div class="stat-info">
         <div class="num">{{ $totalBarang }}</div><div class="lbl">Total Jenis Barang</div>
@@ -69,6 +69,17 @@
           <div class="num" style="color:#2563EB;">{{ $pengadaanMenunggu }}</div>
           <div class="lbl">Permintaan Pengadaan</div>
           <div class="change" style="color:#2563EB;"><span class="pending-dot" style="background:#3B82F6;"></span>Menunggu Persetujuan</div>
+        </div>
+        <i class="bi bi-chevron-right" style="color:#CBD5E1;margin-left:auto;align-self:center;"></i>
+      </div>
+    </a>
+    <a href="{{ route('admin.pengadaan.index', ['status'=>'menunggu_verifikasi']) }}" style="text-decoration:none;">
+      <div class="stat-card" style="border-left:4px solid #D97706;cursor:pointer;transition:transform .15s;{{ $pengadaanVerifikasi > 0 ? 'box-shadow:0 0 0 1px rgba(217,119,6,.2),0 4px 12px rgba(217,119,6,.1);' : '' }}" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div class="stat-icon" style="background:rgba(217,119,6,.1);"><i class="bi bi-shield-exclamation" style="color:#D97706;"></i></div>
+        <div class="stat-info">
+          <div class="num" style="color:#D97706;">{{ $pengadaanVerifikasi }}</div>
+          <div class="lbl">Verifikasi Pengadaan</div>
+          <div class="change" style="color:#92400E;"><span class="pending-dot" style="background:#D97706;"></span>PBJ selesai, perlu verifikasi</div>
         </div>
         <i class="bi bi-chevron-right" style="color:#CBD5E1;margin-left:auto;align-self:center;"></i>
       </div>

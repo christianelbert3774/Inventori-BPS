@@ -36,12 +36,7 @@
         @if($user->nip)
           <span><i class="bi bi-credit-card"></i> NIP {{ $user->nip }}</span>
         @endif
-        @if($user->bagian)
-          <span><i class="bi bi-building"></i> {{ $user->bagian }}</span>
-        @endif
-        @if($user->jabatan)
-          <span><i class="bi bi-briefcase"></i> {{ $user->jabatan }}</span>
-        @endif
+
       </div>
     </div>
   </div>
@@ -121,20 +116,7 @@
                    placeholder="Contoh: 08123456789"/>
             @error('no_telp')<div class="form-error">{{ $message }}</div>@enderror
           </div>
-          <div class="form-group">
-            <label>Bagian / Unit Kerja</label>
-            <input class="form-control {{ $errors->has('bagian') ? 'is-invalid' : '' }}"
-                   type="text" name="bagian" value="{{ old('bagian', $user->bagian) }}"
-                   placeholder="Contoh: Seksi Distribusi"/>
-            @error('bagian')<div class="form-error">{{ $message }}</div>@enderror
-          </div>
-          <div class="form-group">
-            <label>Jabatan</label>
-            <input class="form-control {{ $errors->has('jabatan') ? 'is-invalid' : '' }}"
-                   type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}"
-                   placeholder="Contoh: Staf Statistisi"/>
-            @error('jabatan')<div class="form-error">{{ $message }}</div>@enderror
-          </div>
+
         </div>
 
         {{-- Info role (readonly) --}}
@@ -289,8 +271,8 @@
           </div>
           @foreach($p->details as $d)
             <div style="font-size:13px;font-weight:600;color:var(--text-primary)">
-              {{ $d->barang->nama_barang }}
-              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+              {{ $d->barang->nama_barang ?? '-' }}
+              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? '' }}</span>
             </div>
           @endforeach
           <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px">
@@ -332,8 +314,8 @@
           </div>
           @foreach($p->details as $d)
             <div style="font-size:13px;font-weight:600;color:var(--text-primary)">
-              {{ $d->barang->nama_barang }}
-              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan }}</span>
+              {{ $d->barang->nama_barang ?? $d->nama_barang_baru ?? 'Barang Baru' }}
+              <span style="font-weight:400;color:var(--text-secondary)"> × {{ $d->jumlah }} {{ $d->barang->satuan ?? $d->satuan_baru ?? '' }}</span>
             </div>
           @endforeach
           <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px">

@@ -34,6 +34,13 @@
       <div class="ns-lbl">Permintaan Pemakaian</div>
     </div>
   </div>
+  <div class="notif-summary-item" style="background:rgba(217,119,6,.06);border-color:rgba(217,119,6,.15);">
+    <i class="bi bi-shield-exclamation" style="color:#D97706;"></i>
+    <div>
+      <div class="ns-num" style="color:#D97706;">{{ $notifikasis->where('type','pengadaan')->where('status','menunggu_verifikasi')->count() }}</div>
+      <div class="ns-lbl">Perlu Verifikasi</div>
+    </div>
+  </div>
   <div class="notif-summary-item rejected">
     <i class="bi bi-bag-check-fill"></i>
     <div>
@@ -67,9 +74,14 @@
           }
         } else {
           switch($notif['status']) {
-            case 'approved': $icon='bi-send-fill';$iconColor='var(--bps-blue)';$iconBg='rgba(0,85,165,.1)';$title='Pengadaan Diteruskan ke PBJ';$badgeClass='badge-forwarded';$badgeLabel='Diteruskan';break;
-            case 'rejected': $icon='bi-bag-x-fill';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Permintaan Pengadaan Ditolak';$badgeClass='badge-rejected';$badgeLabel='Ditolak';break;
-            default:         $icon='bi-bag-plus-fill';$iconColor='var(--bps-orange)';$iconBg='rgba(240,125,0,.1)';$title='Permintaan Pengadaan Baru Masuk';$badgeClass='badge-pending';$badgeLabel='Menunggu';
+            case 'pending':              $icon='bi-bag-plus-fill';$iconColor='var(--bps-orange)';$iconBg='rgba(240,125,0,.1)';$title='Permintaan Pengadaan Baru Masuk';$badgeClass='badge-pending';$badgeLabel='Menunggu Persetujuan';break;
+            case 'diproses_pbj':         $icon='bi-send-fill';$iconColor='var(--bps-blue)';$iconBg='rgba(0,85,165,.1)';$title='Menunggu PBJ Mengisi Barang';$badgeClass='badge-forwarded';$badgeLabel='Diproses PBJ';break;
+            case 'menunggu_verifikasi':   $icon='bi-shield-exclamation';$iconColor='#D97706';$iconBg='rgba(217,119,6,.12)';$title='PBJ Selesai — Menunggu Verifikasi Anda';$badgeClass='badge-verify';$badgeLabel='Perlu Verifikasi';break;
+            case 'verified':             $icon='bi-shield-fill-check';$iconColor='#059669';$iconBg='rgba(5,150,105,.1)';$title='Pengadaan Terverifikasi';$badgeClass='badge-approved';$badgeLabel='Terverifikasi';break;
+            case 'verifikasi_ditolak':    $icon='bi-shield-x';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Verifikasi Pengadaan Ditolak';$badgeClass='badge-rejected';$badgeLabel='Verifikasi Ditolak';break;
+            case 'ditolak_pbj':          $icon='bi-x-circle-fill';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Pengadaan Ditolak oleh PBJ';$badgeClass='badge-rejected';$badgeLabel='Ditolak PBJ';break;
+            case 'rejected':             $icon='bi-bag-x-fill';$iconColor='#DC2626';$iconBg='rgba(220,38,38,.1)';$title='Permintaan Pengadaan Ditolak';$badgeClass='badge-rejected';$badgeLabel='Ditolak';break;
+            default:                     $icon='bi-bag-plus-fill';$iconColor='var(--bps-orange)';$iconBg='rgba(240,125,0,.1)';$title='Permintaan Pengadaan';$badgeClass='badge-pending';$badgeLabel='Menunggu';
           }
         }
         $routeDetail = $notif['type']==='pemakaian' ? route('admin.pemakaian.show',$notif['id']) : route('admin.pengadaan.show',$notif['id']);

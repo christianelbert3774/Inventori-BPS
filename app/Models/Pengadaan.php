@@ -15,10 +15,16 @@ class Pengadaan extends Model
         'approved_level2_by',
         'processed_by_level3',
         'completed_at',
+        'foto_bukti',
+        'catatan_pbj',
+        'status_admin_verifikasi',
+        'verified_by',
+        'verified_at',
     ];
 
     protected $casts = [
         'completed_at' => 'datetime',
+        'verified_at'  => 'datetime',
     ];
 
     // ── RELATIONSHIPS ──
@@ -36,6 +42,11 @@ class Pengadaan extends Model
     public function processedByLevel3()
     {
         return $this->belongsTo(User::class, 'processed_by_level3');
+    }
+
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function details()

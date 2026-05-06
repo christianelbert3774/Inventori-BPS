@@ -91,18 +91,17 @@ class PengadaanController extends Controller
                 ]);
 
                 foreach ($request->baru_nama as $i => $namaBaru) {
-                    // Buat record barang baru dengan stok 0 (akan diisi setelah PBJ beli)
-                    $barang = Barang::create([
-                        'kode_barang' => Barang::generateKode(),
-                        'nama_barang' => $namaBaru,
-                        'satuan'      => $request->baru_satuan[$i],
-                        'stok'        => 0,
-                    ]);
-
+                    // BUGFIX: Tidak lagi membuat Barang di sini.
+                    // Data barang baru disimpan sementara di kolom pengadaan_detail.
+                    // Record Barang baru hanya dibuat saat PBJ menyelesaikan pengadaan.
                     PengadaanDetail::create([
-                        'pengadaan_id' => $pengadaan->id,
-                        'barang_id'    => $barang->id,
-                        'jumlah'       => $request->baru_jumlah[$i],
+                        'pengadaan_id'    => $pengadaan->id,
+                        'tipe_item'       => 'baru',
+                        'barang_id'       => null,
+                        'nama_barang_baru'=> $namaBaru,
+                        'satuan_baru'     => $request->baru_satuan[$i],
+                        'jumlah'          => $request->baru_jumlah[$i],
+                        'alasan'          => $request->baru_alasan[$i],
                     ]);
                 }
             });

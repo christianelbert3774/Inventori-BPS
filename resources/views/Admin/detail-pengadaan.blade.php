@@ -7,14 +7,6 @@
 @endsection
 
 @section('content')
-{{--
-  ┌──────────────────────────────────────────────────────────────┐
-  │  BARU — admin/detail-pengadaan.blade.php                     │
-  │  Halaman detail permintaan pengadaan. Menampilkan info       │
-  │  pemohon, barang yang ingin diadakan, dan jumlahnya.         │
-  │  Admin dapat meneruskan ke PBJ atau menolak dari sini.       │
-  └──────────────────────────────────────────────────────────────┘
---}}
 
   <div class="page-header">
     <div class="breadcrumb">
@@ -58,7 +50,7 @@
             </div>
           </div>
           <div>
-            <div class="detail-label">Status Level 2 (Divisi Umum)</div>
+            <div class="detail-label">Status Divisi Umum</div>
             <div class="detail-value">
               @php
                 $sMap = [
@@ -72,23 +64,40 @@
             </div>
           </div>
           <div>
-            <div class="detail-label">Status Level 3 (PBJ)</div>
+            <div class="detail-label">Status PBJ</div>
             <div class="detail-value">
               @php
                 $s3Map = [
                   'pending'   => ['Menunggu', 'badge-pending'],
                   'completed' => ['Selesai', 'badge-approved'],
+                  'rejected'  => ['Ditolak PBJ', 'badge-rejected'],
                 ];
                 [$lbl3, $cls3] = $s3Map[$pengadaan->status_level3] ?? ['-', ''];
               @endphp
               <span class="status-badge {{ $cls3 }}">{{ $lbl3 }}</span>
             </div>
           </div>
+          @if($pengadaan->status_level3 === 'completed')
+            <div>
+              <div class="detail-label">Verifikasi Admin</div>
+              <div class="detail-value">
+                @php
+                  $vMap = [
+                    'belum'    => ['Menunggu Verifikasi', 'badge-pending'],
+                    'verified' => ['Terverifikasi', 'badge-approved'],
+                    'rejected' => ['Ditolak', 'badge-rejected'],
+                  ];
+                  [$vLbl, $vCls] = $vMap[$pengadaan->status_admin_verifikasi] ?? ['-', ''];
+                @endphp
+                <span class="status-badge {{ $vCls }}">{{ $vLbl }}</span>
+              </div>
+            </div>
+          @endif
         </div>
       </div>
 
       {{-- Daftar Barang Pengadaan --}}
-      <div class="card">
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-header">
           <h3><i class="bi bi-bag-plus" style="color:#0055A5;margin-right:8px;"></i>Barang yang Diadakan</h3>
         </div>
@@ -100,6 +109,9 @@
                 <th>Nama Barang</th>
                 <th>Kode</th>
                 <th>Jumlah Diminta</th>
+                @if($pengadaan->status_level3 === 'completed')
+                  <th>Realisasi</th>
+                @endif
                 <th>Stok Sekarang</th>
                 <th>Satuan</th>
               </tr>
@@ -108,26 +120,102 @@
               @foreach($pengadaan->details as $i => $detail)
                 <tr>
                   <td style="color:#94A3B8;">{{ $i + 1 }}</td>
-                  <td style="font-weight:600;color:#1E293B;">{{ $detail->barang->nama_barang ?? '-' }}</td>
-                  <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:#0055A5;">{{ $detail->barang->kode_barang ?? '-' }}</span></td>
+                  <td style="font-weight:600;color:#1E293B;">
+                    @if($detail->tipe_item === 'baru')
+                      {{ $detail->nama_barang_baru }}
+                      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;background:#FEF3C7;color:#92400E;margin-left:4px;">BARU</span>
+                    @else
+                      {{ $detail->barang->nama_barang ?? '-' }}
+                    @endif
+                  </td>
+                  <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:#0055A5;">{{ $detail->barang->kode_barang ?? ($detail->tipe_item === 'baru' ? 'Belum ada' : '-') }}</span></td>
                   <td>
                     <span style="font-weight:700;color:#1D4ED8;">
                       {{ $detail->jumlah }}
                     </span>
                   </td>
+                  @if($pengadaan->status_level3 === 'completed')
+                    <td>
+                      <span style="font-weight:700;color:#059669;">
+                        {{ $detail->jumlah_realisasi ?? 0 }}
+                      </span>
+                    </td>
+                  @endif
                   <td>
-                    @php $stok = $detail->barang->stok ?? 0; @endphp
-                    <span style="font-weight:600;color:{{ $stok === 0 ? '#DC2626' : ($stok <= 10 ? '#D97706' : '#059669') }}">
-                      {{ $stok }}
-                    </span>
+                    @if($detail->tipe_item === 'baru' && !$detail->barang_id)
+                      <span style="font-size:12px;color:#D97706;">Menunggu Verifikasi</span>
+                    @else
+                      @php $stok = $detail->barang->stok ?? 0; @endphp
+                      <span style="font-weight:600;color:{{ $stok === 0 ? '#DC2626' : ($stok <= 10 ? '#D97706' : '#059669') }}">
+                        {{ $stok }}
+                      </span>
+                    @endif
                   </td>
-                  <td style="font-size:12px;color:#64748B;">{{ $detail->barang->satuan ?? '-' }}</td>
+                  <td style="font-size:12px;color:#64748B;">
+                    {{ $detail->tipe_item === 'baru' ? $detail->satuan_baru : ($detail->barang->satuan ?? '-') }}
+                  </td>
                 </tr>
               @endforeach
             </tbody>
           </table>
         </div>
       </div>
+
+      {{-- SECTION VERIFIKASI — Muncul setelah PBJ complete --}}
+      @if($pengadaan->status_level3 === 'completed')
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="bi bi-shield-check" style="color:#0055A5;margin-right:8px;"></i>Data dari PBJ — Bukti Pengadaan</h3>
+          </div>
+          <div style="padding:20px 24px;">
+            {{-- Foto Bukti --}}
+            @if($pengadaan->foto_bukti)
+              <div style="margin-bottom:16px;">
+                <div class="detail-label">Foto Bukti Pembelian</div>
+                <div style="margin-top:8px;position:relative;">
+                  <img src="{{ asset('storage/' . $pengadaan->foto_bukti) }}" alt="Foto Bukti"
+                       style="max-width:100%;max-height:400px;border-radius:12px;border:1px solid #E2E8F0;cursor:pointer;transition:transform .2s;"
+                       onclick="window.open(this.src, '_blank')"
+                       onmouseover="this.style.transform='scale(1.02)'"
+                       onmouseout="this.style.transform='scale(1)'"/>
+                  <div style="font-size:11px;color:#94A3B8;margin-top:6px;">
+                    <i class="bi bi-zoom-in"></i> Klik gambar untuk melihat ukuran penuh
+                  </div>
+                </div>
+              </div>
+            @else
+              <div style="padding:20px;text-align:center;color:#94A3B8;font-size:13px;">
+                <i class="bi bi-image" style="font-size:24px;"></i>
+                <div style="margin-top:4px;">Tidak ada foto bukti</div>
+              </div>
+            @endif
+
+            {{-- Catatan PBJ --}}
+            @if($pengadaan->catatan_pbj)
+              <div style="margin-top:16px;">
+                <div class="detail-label">Catatan dari PBJ</div>
+                <div style="margin-top:6px;padding:12px 16px;background:#F8FAFC;border-radius:8px;border:1px solid #E2E8F0;font-size:13px;color:#475569;line-height:1.6;">
+                  {{ $pengadaan->catatan_pbj }}
+                </div>
+              </div>
+            @endif
+
+            {{-- Diselesaikan oleh --}}
+            <div style="margin-top:16px;display:flex;gap:24px;font-size:13px;">
+              <div>
+                <div class="detail-label">Diselesaikan oleh</div>
+                <div class="detail-value">{{ $pengadaan->processedByLevel3->name ?? '-' }}</div>
+              </div>
+              @if($pengadaan->completed_at)
+                <div>
+                  <div class="detail-label">Tanggal Selesai</div>
+                  <div class="detail-value">{{ $pengadaan->completed_at->format('d/m/Y H:i') }}</div>
+                </div>
+              @endif
+            </div>
+          </div>
+        </div>
+      @endif
     </div>
 
     {{-- KOLOM KANAN: Panel Aksi --}}
@@ -139,18 +227,18 @@
         <div style="padding:20px 24px;">
 
           @if($pengadaan->status_level2 === 'pending')
+            {{-- ──── Status: Menunggu approval Divisi Umum ──── --}}
             <p style="font-size:13px;color:#64748B;margin-bottom:20px;line-height:1.6;">
               Tinjau permintaan pengadaan ini. Jika disetujui, permintaan akan
               <strong>diteruskan ke PBJ</strong> untuk dilakukan pembelian barang.
             </p>
 
-            {{-- Tombol Teruskan ke PBJ --}}
             <button type="button"
               onclick="showConfirm({
                 title: 'Teruskan ke PBJ?',
                 message: 'Permintaan pengadaan akan disetujui dan diteruskan ke PBJ untuk ditindaklanjuti.',
                 icon: 'bi-send-fill', iconColor: '#059669',
-                confirmText: 'Ya, Teruskan ke PBJ', confirmClass: 'confirm-btn-success',
+                confirmText: 'Teruskan ke PBJ', confirmClass: 'confirm-btn-success',
                 onConfirm: function() { document.getElementById('form-approve-pgd-detail').submit(); }
               })"
               style="width:100%;padding:12px;border-radius:10px;border:none;background:#059669;
@@ -163,7 +251,6 @@
               @csrf @method('PATCH')
             </form>
 
-            {{-- Tombol Tolak --}}
             <button type="button"
               onclick="showConfirm({
                 title: 'Tolak Permintaan?',
@@ -182,7 +269,94 @@
               @csrf @method('PATCH')
             </form>
 
+          @elseif($pengadaan->status_level2 === 'approved' && $pengadaan->status_level3 === 'completed' && $pengadaan->status_admin_verifikasi === 'belum')
+            {{-- ──── Status: PBJ sudah complete, menunggu verifikasi Admin ──── --}}
+            <div style="text-align:center;padding:8px 0 16px;">
+              <div style="width:56px;height:56px;background:#FEF3C7;border-radius:50%;
+                          display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                <i class="bi bi-shield-exclamation" style="font-size:24px;color:#D97706;"></i>
+              </div>
+              <div style="font-weight:700;color:#92400E;margin-bottom:4px;">Menunggu Verifikasi Anda</div>
+              <div style="font-size:12px;color:#94A3B8;">
+                PBJ telah menyelesaikan pembelian. Periksa foto bukti dan data realisasi, lalu verifikasi.
+              </div>
+            </div>
+
+            <button type="button"
+              onclick="showConfirm({
+                title: 'Verifikasi & Masukkan Stok?',
+                message: 'Data realisasi dari PBJ akan diverifikasi dan stok barang akan ditambahkan ke sistem inventori.',
+                icon: 'bi-shield-check', iconColor: '#059669',
+                confirmText: 'Ya, Verifikasi', confirmClass: 'confirm-btn-success',
+                onConfirm: function() { document.getElementById('form-verify-pengadaan').submit(); }
+              })"
+              style="width:100%;padding:12px;border-radius:10px;border:none;background:#059669;
+                     color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;
+                     display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+              <i class="bi bi-shield-check"></i> Verifikasi & Masukkan Stok
+            </button>
+            <form id="form-verify-pengadaan" method="POST"
+                  action="{{ route('admin.pengadaan.verify', $pengadaan->id) }}">
+              @csrf @method('PATCH')
+            </form>
+
+            <button type="button"
+              onclick="showConfirm({
+                title: 'Tolak Verifikasi?',
+                message: 'Data pengadaan dari PBJ akan ditolak dan stok tidak akan ditambahkan.',
+                icon: 'bi-x-circle-fill', iconColor: '#DC2626',
+                confirmText: 'Tolak Verifikasi', confirmClass: 'confirm-btn-danger',
+                onConfirm: function() { document.getElementById('form-reject-verification').submit(); }
+              })"
+              style="width:100%;padding:12px;border-radius:10px;border:none;background:#FEF2F2;
+                     color:#DC2626;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;
+                     display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid #FCA5A5;">
+              <i class="bi bi-x-circle-fill"></i> Tolak Verifikasi
+            </button>
+            <form id="form-reject-verification" method="POST"
+                  action="{{ route('admin.pengadaan.rejectVerification', $pengadaan->id) }}">
+              @csrf @method('PATCH')
+            </form>
+
+          @elseif($pengadaan->status_admin_verifikasi === 'verified')
+            {{-- ──── Status: Sudah diverifikasi ──── --}}
+            <div style="text-align:center;padding:16px 0;">
+              <div style="width:56px;height:56px;background:#D1FAE5;border-radius:50%;
+                          display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                <i class="bi bi-shield-fill-check" style="font-size:24px;color:#059669;"></i>
+              </div>
+              <div style="font-weight:700;color:#065F46;margin-bottom:4px;">Terverifikasi ✓</div>
+              <div style="font-size:12px;color:#94A3B8;">
+                Stok telah ditambahkan ke sistem
+                @if($pengadaan->verifiedBy)
+                  <br>oleh {{ $pengadaan->verifiedBy->name }}
+                @endif
+                @if($pengadaan->verified_at)
+                  <br>{{ $pengadaan->verified_at->format('d/m/Y H:i') }}
+                @endif
+              </div>
+            </div>
+
+          @elseif($pengadaan->status_admin_verifikasi === 'rejected')
+            {{-- ──── Status: Verifikasi ditolak ──── --}}
+            <div style="text-align:center;padding:16px 0;">
+              <div style="width:56px;height:56px;background:#FEE2E2;border-radius:50%;
+                          display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                <i class="bi bi-shield-x" style="font-size:24px;color:#DC2626;"></i>
+              </div>
+              <div style="font-weight:700;color:#991B1B;margin-bottom:4px;">Verifikasi Ditolak</div>
+              <div style="font-size:12px;color:#94A3B8;">
+                @if($pengadaan->verifiedBy)
+                  oleh {{ $pengadaan->verifiedBy->name }}
+                @endif
+                @if($pengadaan->verified_at)
+                  <br>{{ $pengadaan->verified_at->format('d/m/Y H:i') }}
+                @endif
+              </div>
+            </div>
+
           @elseif($pengadaan->status_level2 === 'approved')
+            {{-- ──── Status: Diteruskan ke PBJ, menunggu PBJ --}}
             <div style="text-align:center;padding:16px 0;">
               <div style="width:56px;height:56px;background:#DBEAFE;border-radius:50%;
                           display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
@@ -191,10 +365,12 @@
               <div style="font-weight:700;color:#1E40AF;margin-bottom:4px;">Diteruskan ke PBJ</div>
               <div style="font-size:12px;color:#94A3B8;">
                 oleh {{ $pengadaan->approvedLevel2By->name ?? '-' }}
+                <br>Menunggu PBJ menyelesaikan pembelian
               </div>
             </div>
 
           @else
+            {{-- ──── Status: Ditolak ──── --}}
             <div style="text-align:center;padding:16px 0;">
               <div style="width:56px;height:56px;background:#FEE2E2;border-radius:50%;
                           display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">

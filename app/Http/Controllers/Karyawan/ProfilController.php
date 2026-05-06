@@ -119,4 +119,38 @@ class ProfilController extends Controller
             'user', 'pemakaians', 'pengadaans', 'bulanLabel', 'bulan'
         ));
     }
+
+    /**
+     * Print satu permintaan pemakaian.
+     */
+    public function printPemakaian(Pemakaian $pemakaian)
+    {
+        $user = Auth::user();
+
+        // Pastikan pemakaian milik user ini
+        if ($pemakaian->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $pemakaian->load(['details.barang', 'approvedBy']);
+
+        return view('karyawan.print-single-pemakaian', compact('user', 'pemakaian'));
+    }
+
+    /**
+     * Print satu permintaan pengadaan.
+     */
+    public function printPengadaan(Pengadaan $pengadaan)
+    {
+        $user = Auth::user();
+
+        // Pastikan pengadaan milik user ini
+        if ($pengadaan->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $pengadaan->load(['details.barang']);
+
+        return view('karyawan.print-single-pengadaan', compact('user', 'pengadaan'));
+    }
 }
